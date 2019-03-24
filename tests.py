@@ -32,6 +32,21 @@ class DAOCase(unittest.TestCase):
         self.assertEqual(self.client.id, 1)
         self.assertEqual(client.id, 2)
 
+    def test_find_all(self):
+        client = Client()
+        clients = client.find_all()
+        self.assertEqual(len(clients), 1)
+
+    def test_find_one(self):
+        client = Client()
+        client = client.find_one(1)
+        self.assertEqual(client.name, "Client A")
+
+    def test_find_one_404(self):
+        client = Client()
+        client = client.find_one(2)
+        self.assertEqual(client, None)
+
     def test_unique(self):
         client = Client()
         client.name = "Client A"
@@ -96,7 +111,22 @@ class PriorityCase(unittest.TestCase):
         self.assertNotEqual(feature_request.priority, 4)
         self.assertEqual(feature_request.priority, 3)
 
+    def test_client_requests(self):
+        client1 = Client.query.get(1)
+        client2 = Client()
+        client2.name = "Client 2"
+        client2.save()
 
+        requests1 = client1.requests.count()
+        requests2 = client2.requests.count()
+        self.assertEqual(requests1, 1)
+        self.assertEqual(requests2, 0)
+
+    def test_feature_requests(self):
+        feature_request = FeatureRequest().query.get((1,1))
+        feature_title = feature_request.feature.title
+        self.assertNotEqual(feature_title, "The next big thin")
+        self.assertEqual(feature_title, "The next big thing")
 
 if __name__ == '__main__':
     try:

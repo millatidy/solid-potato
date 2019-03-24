@@ -4,6 +4,13 @@ from datetime import datetime, timedelta
 
 class DAO(object):
 
+    @classmethod        
+    def find_all(cls):
+        return cls.query.all()
+
+    def find_one(self, id):
+        return self.query.get(id)
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -33,6 +40,7 @@ class DAO_UNIQUE_NAME(DAO):
 class Client(DAO_UNIQUE_NAME, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
+    requests = db.relationship('FeatureRequest', lazy='dynamic', backref='client')
 
 
 class ProductArea(DAO_UNIQUE_NAME, db.Model):
@@ -45,6 +53,7 @@ class Feature(DAO, db.Model):
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
     product_area_id = db.Column(db.Integer, db.ForeignKey('product_area.id'), nullable=False)
+    requests = db.relationship('FeatureRequest', lazy='dynamic', backref='feature')
 
     def save(self):
         if not self.is_unique():
