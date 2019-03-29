@@ -24,4 +24,4 @@ if not app.debug:
 	# Sentry
 	sentry = Sentry(app, dsn='https://f70b58dfecda4089b51567122c36a881:4fcb5bf1b52f4ddc974db998dc3f1fd2@sentry.io/1292364')
 
-from app import routes, models
+from app import routes, models, messages
