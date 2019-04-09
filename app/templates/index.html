@@ -196,6 +196,40 @@
 				</div>
 		</div>
 
+		<div id="editRequest" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+						<div class="modal-content">
+								<div class="modal-header">
+										<h3 id="addDialogLabel" class="modal-title">Edit Feature Request</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+										</button>
+								</div>
+								<div class="modal-body">
+										<form>
+												<label for="editPriority">Priority</label>
+												<select data-bind="value: priority" type="text" id="editPriority" class="form-control">
+													<option>Select New Priority</option>
+													<option>1</option>
+													<option>2</option>
+													<option>3</option>
+													<option>4</option>
+													<option>5</option>
+												</select>
+
+												<label for="editTargetDate">New Target Date</label>
+												<input data-bind="value: targetDate" type="text" id="editTargetDate" placeholder="YYYY-MM-DD" class="form-control">
+												
+										</form>
+								</div>
+								<div class="modal-footer">
+										<button data-bind="click: editRequest" class="btn btn-primary">Update Request</button>
+										<button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+								</div>
+						</div>
+				</div>
+		</div>
+
 		<script type="text/javascript">
 
 		function FeaturesViewModel() {
@@ -409,11 +443,15 @@
 			}
 
 			self.beginEdit = function(featureRequest) {
-				alert("lets edit");
+				editFeatureRequestViewModel.initialize(self.id, self.clients);
+				editFeatureRequestViewModel.setFeatureRequest(featureRequest);
+				$('#editRequest').modal('show');
 			}
 
 			self.remove = function(featureRequest) {
-				alert("lets delete");
+				featuresViewModel.ajax(featureRequest.uri(), 'DELETE').done(function() {
+								self.requests.remove(featureRequest);
+						});
 			}
 
 			self.initialize = function(feature, clients) {
@@ -470,17 +508,40 @@
 			}
 		}
 
+		function EditFeatureRequestViewModel() {
+			self = this;
+			self.featureID = ko.observable();
+			self.clientID = ko.observable();
+			self.priority = ko.observable();
+			self.targetDate = ko.observable();
+			self.clients = ko.observableArray();
+
+			self.initialize = function(featureID, clients) {
+				self.featureID(featureID());
+				self.clients(clients());
+			}
+
+			self.setFeatureRequest = function(featureRequest) {
+				self.featureID(featureRequest.featureID());
+				self.clientID(featureRequest.clientID());
+				self.priority(featureRequest.priority());
+				self.targetDate(featureRequest.targetDate());
+			}
+		}
+
 
 		var featuresViewModel = new FeaturesViewModel();
 		var addFeatureModel = new AddFeatureViewModel();
 		var editFeatureViewModel = new EditFeatureViewModel();
 		var featureDetailsViewModel = new FeatureDetailsViewModel();
 		var addFeatureRequestViewModel = new AddFeatureRequestViewModel();
+		var editFeatureRequestViewModel = new EditFeatureRequestViewModel();
 		ko.applyBindings(featuresViewModel, $('#main')[0]);
 		ko.applyBindings(addFeatureModel, $('#add')[0]);
 		ko.applyBindings(editFeatureViewModel, $('#edit')[0]);
 		ko.applyBindings(featureDetailsViewModel, $('#feature-detail')[0]);
 		ko.applyBindings(addFeatureRequestViewModel, $('#addRequest')[0]);
+		ko.applyBindings(editFeatureRequestViewModel, $('#editRequest')[0]);
 
 		</script>
 </body>
