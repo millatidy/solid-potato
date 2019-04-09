@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<title>BriteCore Feature Requeast App</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/skill.css') }}">
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js'></script>
+</head>
+<body>
+		<div class="navbar">
+				<div class="navbar-inner">
+						<a class="brand" href="#">Feature Request App</a>
+				</div>
+		</div>
+		<div id="main" class="container">
+
+			<div id="newFeatureButton">
+				<button data-bind="click: beginAdd" data-toggle="modal"  class="btn btn-primary">New Feature</button>
+			</div>
+			<br>
+
+				<table id="features" class="table table-hover">
+					<thead>
+						<tr>
+								<td><b>No: Requests</b></td>
+								<td><b>Feature</b></td>
+								<td><b>Options</b></td>
+						</tr>
+					</thead>
+
+						<!-- ko foreach: features -->
+						<tbody>
+						<tr>
+								<td>
+										<span data-bind="text: noRequests">noRequests</span>
+								</td>
+								<td><p><b data-bind="text: title"></b></p></td>
+								<td>
+									<button data-bind="click: $parent.beginView" type="button"  class="btn btn-primary">View</button>
+										<button data-bind="click: $parent.beginEdit" type="button"  class="btn btn-primary">Edit</button>
+										<button data-bind="click: $parent.remove" type="button"  class="btn btn-primary">Delete</button>
+										<span data-bind="visible: noRequests"><button data-bind="click: $parent.markInProgress" type="button"  class="btn btn-primary">Edit Requests</button></span>
+										<span data-bind="visible: !noRequests()"><button data-bind="click: $parent.markDone" type="button"  class="btn btn-primary">Add Requests</button></span>
+								</td>
+						</tr>
+					</tbody>
+						
+						<!-- /ko -->
+
+				</table>
+
+		</div>
+
+		<div id="feature-detail" class="container" style="display: none; ">
+					<h3 data-bind="text: title"></h3>
+					<p data-bind="text: description"></p>
+
+					<div id="newRequestButton">
+						<button data-bind="click: beginAdd" data-toggle="modal"  class="btn btn-primary">New Request</button>
+					</div>
+					<br>
+
+					<table id="feature-requests" class="table table-hover">
+						<thead>
+							<tr>
+								<td><b>Client</b></td>
+								<td><b>Priority</b></td>
+								<td><b>Target Date</b></td>
+								<td><b>Options</b></td>
+							</td>
+						</thead>
+						<tbody>
+							<!-- ko foreach: requests -->
+							<tr>
+								<td data-bind="text: clientID"></td>
+								<td data-bind="text: priority"></td>
+								<td data-bind="text: targetDate"></td>
+								<td>
+									<button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
+									<button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
+								</td>
+							</tr>
+							<!-- /ko -->
+						</tbody>
+
+					</table>
+
+				</div>
+
+		<div id="add" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+						<div class="modal-content">
+								<div class="modal-header">
+										<h3 id="addDialogLabel" class="modal-title">New Feature</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+										</button>
+								</div>
+								<div class="modal-body">
+										<form>
+												<label for="inputTitle">Feature Title</label>
+												<input data-bind="value: title" type="text" id="inputTitle" placeholder="Feature Title" class="form-control">
+
+												<label for="inputDescription">Description</label>
+												<input data-bind="value: description" type="text" id="inputDescription" placeholder="Description" class="form-control">
+
+												<label for="inputProductArea">Product Area</label>
+												<select data-bind="value: productArea" type="text" id="inputProductArea" class="form-control">
+													<option selected>Choose Product Area</option>
+													<!-- ko foreach: productAreas -->
+													<option data-bind="text: name, value: id"></option>
+													<!-- /ko -->
+												</select>
+												
+										</form>
+								</div>
+								<div class="modal-footer">
+										<button data-bind="click: addFeature" class="btn btn-primary">Add Feature</button>
+										<button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+								</div>
+						</div>
+				</div>
+		</div>
+
+		<div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editDialogLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+						<div class="modal-content">
+								<div class="modal-header">
+										<h3 id="editDialogLabel" class="modal-title">Edit Feature</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+										</button>
+								</div>
+								<div class="modal-body">
+										<form>
+												<label for="editTitle">Feature Title</label>
+												<input data-bind="value: title" type="text" id="editTitle" placeholder="Feature Title" class="form-control">
+
+												<label for="editDescription">Description</label>
+												<input data-bind="value: description" type="text" id="editDescription" placeholder="Description" class="form-control">
+												
+										</form>
+								</div>
+								<div class="modal-footer">
+										<button data-bind="click: editFeature" class="btn btn-primary">Edit Feature</button>
+										<button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+								</div>
+						</div>
+				</div>
+		</div>
+
+		<div id="addRequest" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+						<div class="modal-content">
+								<div class="modal-header">
+										<h3 id="addDialogLabel" class="modal-title">New Feature Request</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+										</button>
+								</div>
+								<div class="modal-body">
+										<form>
+												<label for="inputClient">Client</label>
+												<select data-bind="value: clientID" type="text" id="inputClient" class="form-control">
+													<option selected>Choose Client</option>
+													<!-- ko foreach: clients -->
+													<option data-bind="text: name, value: id"></option>
+													<!-- /ko -->
+												</select>
+
+												<label for="inputPriority">Priority</label>
+												<select data-bind="value: priority" type="text" id="inputPriority" class="form-control">
+													<option selected>Set Priority</option>
+													<option>1</option>
+													<option>2</option>
+													<option>3</option>
+													<option>4</option>
+													<option>5</option>
+												</select>
+
+												<label for="inputTargetDate">Target Date</label>
+												<input data-bind="value: targetDate" type="text" id="inputTargetDate" placeholder="YYYY-MM-DD" class="form-control">
+												
+										</form>
+								</div>
+								<div class="modal-footer">
+										<button data-bind="click: addRequest" class="btn btn-primary">Add Request</button>
+										<button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+								</div>
+						</div>
+				</div>
+		</div>
+
+		<script type="text/javascript">
+
+		function FeaturesViewModel() {
+				var self = this;
+				self.api = "http://localhost:5000"
+				self.featuresURI = self.api + "/features";
+				self.clientsURI = self.api + "/clients";
+				self.productAreasURI = self.api + "/product-areas";
+				self.featureRequestsURI = self.api + "/feature-requets";
+				self.features = ko.observableArray();
+				self.productAreas = ko.observableArray();
+				self.clients = ko.observableArray();
+				self.featureRequests = ko.observableArray();
+
+				self.ajax = function(uri, method, data) {
+						var request = {
+								url: uri,
+								type: method,
+								contentType: "application/json",
+								accepts: "application/json",
+								cache: false,
+								dataType: 'json',
+								data: JSON.stringify(data),
+								beforeSend: function(xhr) {
+										xhr.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:8000")
+								},
+								error: function(jqXHR) {
+										console.log("ajax error " + jqXHR.status);
+								}
+						};
+						return $.ajax(request);
+				}
+
+				self.beginAdd = function() {
+					addFeatureModel.setProductAreas(self.productAreas)
+						$('#add').modal('show');
+				}
+
+				self.add = function(feature) {
+						self.ajax(self.featuresURI, 'POST', feature).done(function(data) {
+								self.features.push({
+										title: ko.observable(data.title),
+										description: ko.observable(data.description),
+										product_area_id: ko.observable(data.product_area_id)
+								});
+						});
+				}
+
+				self.beginView = function(feature) {
+					$(document).ready(function(){
+						featureDetailsViewModel.initialize(feature, self.clients);
+						$("#main").hide();
+						$("#feature-detail").show();
+					});
+				}
+
+				self.beginEdit = function(feature) {
+						editFeatureViewModel.setFeature(feature);
+						$('#edit').modal('show');
+				}
+
+				self.edit = function(feature, data) {
+						self.ajax(feature.uri(), 'PUT', data).done(function(res) {
+								self.updateFeature(feature, res);
+						})
+				}
+
+				self.updateFeature = function(feature, newFeature) {
+						var i = self.features.indexOf(feature);
+						// self.features()[i].uri
+						self.features()[i].title(newFeature.title);
+						self.features()[i].description(newFeature.description);
+						self.features()[i].product_area_id(newFeature.product_area_id)
+				};
+
+				self.remove = function(feature) {
+						self.ajax(feature.uri(), 'DELETE').done(function() {
+								self.features.remove(feature);
+						});
+				}
+
+				self.markInProgress = function(feature) {
+						feature.done(false);
+				}
+
+				self.markDone = function(feature) {
+						feature.done(true);
+				}
+
+				// Get features
+				self.ajax(self.featuresURI, 'GET').done(
+						function(data) {
+						for (var i = 0; i < data.items.length; i++) {
+								self.features.push({
+									id: ko.observable(data.items[i].id),
+										title: ko.observable(data.items[i].title),
+										description: ko.observable(data.items[i].description),
+										uri: ko.observable(data.items[i].links.self),
+										product_area_id: ko.observable(data.items[i].product_area_id),
+										productAreaURI: ko.observable(data.items[i].links.product_area),
+										requestsURI: ko.observable(data.items[i].links.requests),
+										noRequests: ko.observable(data.items[i].no_requests)
+								});
+						}
+				});
+
+				// Get clients
+				self.ajax(self.clientsURI, 'GET').done(
+					function(data) {
+						for (var i = 0; i < data.items.length; i++) {
+							self.clients.push({
+								id: ko.observable(data.items[i].id),
+								name: ko.observable(data.items[i].name),
+								uri: ko.observable(data.items[i].links.self),
+								requstsURI: ko.observable(data.items[i].links.requests)
+							});
+						}
+					});
+
+				// Get product areas
+				self.ajax(self.productAreasURI, 'GET').done(
+				function(data) {
+					for (var i = 0; i < data.items.length; i++) {
+						self.productAreas.push({
+							id: ko.observable(data.items[i].id),
+							name: ko.observable(data.items[i].name),
+							uri: ko.observable(data.items[i].links.self)
+						});
+					}
+				});
+		}
+
+		function AddFeatureViewModel() {
+				var self = this;
+				self.title = ko.observable();
+				self.description = ko.observable();
+				self.productArea = ko.observable();
+				self.productAreas = ko.observableArray();
+
+				self.addFeature = function() {
+						$('#add').modal('hide');
+						featuresViewModel.add({
+								title: self.title(),
+								description: self.description(),
+								product_area_id: self.productArea()
+						});
+						self.title("");
+						self.description("");
+						self.productArea("")
+				}
+
+				self.setProductAreas = function(productAreas) {
+					self.productAreas(productAreas());
+					$('#add').modal('show');
+				}
+		}
+
+		function EditFeatureViewModel() {
+				var self = this;
+				self.title = ko.observable();
+				self.description = ko.observable();
+				self.product_area_id = ko.observable();
+
+				self.setFeature = function(feature) {
+						self.feature = feature;
+						self.title(feature.title());
+						self.description(feature.description());
+						self.product_area_id(feature.product_area_id());
+						$('#edit').modal('show');
+				}
+
+				self.editFeature = function() {
+						$('#edit').modal('hide');
+						featuresViewModel.edit(self.feature, {
+								title: self.title(),
+								description: self.description(),
+								product_area_id: self.product_area_id()
+						});
+				}
+		}
+
+		function FeatureDetailsViewModel() {
+			var self = this;
+			self.id = ko.observable();
+			self.title = ko.observable();
+			self.description = ko.observable();
+			self.product_area_id = ko.observable();
+			self.uri = ko.observable();
+			// self.product_area_id = ko.observable();
+			self.productAreaURI = ko.observable();
+			self.requestsURI = ko.observable();
+			// self.noRequests = ko.observable();
+			self.requests = ko.observableArray();
+			self.clients = ko.observableArray();
+
+			self.beginAdd = function() {
+				addFeatureRequestViewModel.initialize(self.id, self.clients);
+				$('#addRequest').modal('show');
+			}
+
+			self.add = function(featureRequest) {
+				$('#addRequest').modal('hide');
+				featuresViewModel.ajax(self.requestsURI(), 'POST', featureRequest).done(function(data) {
+								self.requests.push({
+										featureID: ko.observable(data.feature_id),
+										clientID: ko.observable(data.client_id),
+										priority: ko.observable(data.priority),
+										targetDate: ko.observable(data.target_date)
+								});
+						});
+			}
+
+			self.beginEdit = function(featureRequest) {
+				alert("lets edit");
+			}
+
+			self.remove = function(featureRequest) {
+				alert("lets delete");
+			}
+
+			self.initialize = function(feature, clients) {
+						self.id(feature.id());
+						self.title(feature.title());
+						self.description(feature.description());
+						self.productAreaURI(feature.productAreaURI());
+						self.requestsURI(feature.requestsURI());
+						self.clients(clients());
+						self.getRequests();
+			}
+
+			// get requests
+			self.getRequests = function() {
+				featuresViewModel.ajax(self.requestsURI(), 'GET').done(
+				function(data) {
+					for (var i = 0; i < data.items.length; i++) {
+						self.requests.push({
+							featureID: ko.observable(data.items[i].feature_id),
+							clientID: ko.observable(data.items[i].client_id),
+							priority: ko.observable(data.items[i].priority),
+							targetDate: ko.observable(data.items[i].target_date),
+							uri: ko.observable(data.items[i].links.self)
+						});
+					}
+				});
+			}
+		}
+
+		function AddFeatureRequestViewModel() {
+			self = this;
+			self.featureID = ko.observable();
+			self.clientID = ko.observable();
+			self.priority = ko.observable();
+			self.targetDate = ko.observable();
+			self.clients = ko.observableArray();
+
+			self.initialize = function(featureID, clients) {
+				self.featureID(featureID());
+				self.clients(clients());
+			}
+
+			self.addRequest = function() {
+				featureDetailsViewModel.add({
+					feature_id: self.featureID(),
+					client_id: self.clientID(),
+					priority: self.priority(),
+					target_date: self.targetDate()
+				});
+				self.featureID("");
+				self.clientID("");
+				self.priority("");
+				self.targetDate("");
+			}
+		}
+
+
+		var featuresViewModel = new FeaturesViewModel();
+		var addFeatureModel = new AddFeatureViewModel();
+		var editFeatureViewModel = new EditFeatureViewModel();
+		var featureDetailsViewModel = new FeatureDetailsViewModel();
+		var addFeatureRequestViewModel = new AddFeatureRequestViewModel();
+		ko.applyBindings(featuresViewModel, $('#main')[0]);
+		ko.applyBindings(addFeatureModel, $('#add')[0]);
+		ko.applyBindings(editFeatureViewModel, $('#edit')[0]);
+		ko.applyBindings(featureDetailsViewModel, $('#feature-detail')[0]);
+		ko.applyBindings(addFeatureRequestViewModel, $('#addRequest')[0]);
+
+		</script>
+</body>

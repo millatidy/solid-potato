@@ -6,14 +6,14 @@ from flask_cors import CORS
 # from flask_mail import Mail
 from raven.contrib.flask import Sentry
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path = "")
 app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 cors = CORS(app, resources={r"/*": {
 									"origins": [
-										"http://localhost:8080"
+										"http://0.0.0.0:5000"
 										]
 									}
 								}

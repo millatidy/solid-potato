@@ -15,11 +15,11 @@ class DAO(object):
         db.session.add(self)
         db.session.commit()
 
-    def update(self):
-        old = self.query.get(self.id)
-        old = self
-        db.session.commit()
-        return old
+    # def update(self):
+    #     old = self.query.get(self.id)
+    #     old = self
+    #     db.session.commit()
+    #     return old
 
     def delete(self):
         self = self.query.get(self.id)
@@ -74,7 +74,7 @@ class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
             'name': self.name,
             'links': {
                 'self': url_for('client', id=self.id),
-                'requests': url_for('feature_requests', client_id=1)
+                'requests': url_for('get_feature_request', client_id=self.id)
             }
         }
         return data
@@ -118,11 +118,12 @@ class Feature(PaginatedAPIMixin, DAO, db.Model):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'product area': ProductArea.query.get(self.product_area_id).to_dict(),
+            'product_area_id': self.product_area_id,
+            'no_requests': self.requests.count(),
             'links': {
                 'self': url_for('feature', id=self.id),
-                'product area':url_for('product_area', id=self.product_area_id),
-                'feature requests': url_for('feature_requests', feature_id=self.id)
+                'product_area':url_for('product_area', id=self.product_area_id),
+                'requests': url_for('get_feature_request', feature_id=self.id)
             }
         }
         return data
@@ -141,7 +142,7 @@ class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
             'priority': self.priority,
             'target_date': self.target_date,
             'links': {
-                'self': url_for('feature_request', feature_id=self.feature_id, client_id=self.client_id),
+                'self': url_for('get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
                 'feature': url_for('feature', id=self.feature_id),
                 'client': url_for('client', id=self.client_id)
             }
