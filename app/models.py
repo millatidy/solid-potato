@@ -1,5 +1,5 @@
 from app import db
-from flask import abort
+from flask import abort, url_for
 from datetime import datetime, timedelta
 
 class DAO(object):
@@ -15,11 +15,14 @@ class DAO(object):
         db.session.add(self)
         db.session.commit()
 
-    def update(self):
-        db.session.commit()
-        return self
+    # def update(self):
+    #     old = self.query.get(self.id)
+    #     old = self
+    #     db.session.commit()
+    #     return old
 
     def delete(self):
+        self = self.query.get(self.id)
         db.session.delete(self)
         db.session.commit()
 
@@ -36,24 +39,68 @@ class DAO_UNIQUE_NAME(DAO):
             return False
         return True
 
+class PaginatedAPIMixin(object):
+    @staticmethod
+    def to_collection_dict(query, page, per_page, endpoint, **kwargs):
+        resources = query.paginate(page, per_page, False)
+        data = {
+            'items': [item.to_dict() for item in resources.items],
+            '_meta': {
+                'page': page,
+                'per_page': per_page,
+                'total_pages': resources.pages,
+                'total_items': resources.total
+            },
+            '_links': {
+                'self': url_for(endpoint, page=page, per_page=per_page,
+                                **kwargs),
+                'next': url_for(endpoint, page=page + 1, per_page=per_page,
+                                **kwargs) if resources.has_next else None,
+                'prev': url_for(endpoint, page=page - 1, per_page=per_page,
+                                **kwargs) if resources.has_prev else None
+            }
+        }
+        return data
 
-class Client(DAO_UNIQUE_NAME, db.Model):
+
+class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
-    requests = db.relationship('FeatureRequest', lazy='dynamic', backref='client')
+    requests = db.relationship('FeatureRequest', cascade='all, delete, delete-orphan', lazy='dynamic', backref='client')
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'links': {
+                'self': url_for('client', id=self.id),
+                'requests': url_for('get_feature_request', client_id=self.id)
+            }
+        }
+        return data
 
 
-class ProductArea(DAO_UNIQUE_NAME, db.Model):
+class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
 
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'links': {
+                'self': url_for('product_area', id=self.id),
+            }
+        }
+        return data
 
-class Feature(DAO, db.Model):
+
+class Feature(PaginatedAPIMixin, DAO, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
     product_area_id = db.Column(db.Integer, db.ForeignKey('product_area.id'), nullable=False)
-    requests = db.relationship('FeatureRequest', lazy='dynamic', backref='feature')
+    requests = db.relationship('FeatureRequest', cascade='all, delete, delete-orphan', lazy='dynamic', backref='feature')
 
     def save(self):
         if not self.is_unique():
@@ -66,9 +113,38 @@ class Feature(DAO, db.Model):
             return False
         return True
 
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'product_area_id': self.product_area_id,
+            'no_requests': self.requests.count(),
+            'links': {
+                'self': url_for('feature', id=self.id),
+                'product_area':url_for('product_area', id=self.product_area_id),
+                'requests': url_for('get_feature_request', feature_id=self.id)
+            }
+        }
+        return data
 
-class FeatureRequest(DAO, db.Model):
+
+class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
     feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'), primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
     priority = db.Column(db.Integer)
     target_date = db.Column(db.DateTime(), default=datetime.utcnow() + timedelta(days=90))
+
+    def to_dict(self):
+        data = {
+            'feature_id': self.feature_id,
+            'client_id': self.client_id,
+            'priority': self.priority,
+            'target_date': self.target_date,
+            'links': {
+                'self': url_for('get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
+                'feature': url_for('feature', id=self.feature_id),
+                'client': url_for('client', id=self.client_id)
+            }
+        }
+        return data
