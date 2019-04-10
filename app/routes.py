@@ -9,13 +9,17 @@ from datetime import datetime
 def index_page():
     return render_template('features.html')
 
-@app.route('/clients')
+@app.route('/client')
 def clients_page():
     return render_template('clients.html')
 
+@app.route('/client/<int:id>')
+def client_detials_page(id):
+    return render_template('client_details.html')
+
 @app.route('/feature/<int:id>')
 def feature_deatils_page(id):
-    return render_template('feature_details.html', id=id)
+    return render_template('feature_details.html')
 
 
 @app.route('/api/clients', methods=['GET', 'POST'])

@@ -1,8 +1,3 @@
-// $(document).ready(function() {
-
-function fn1 () {
-    alert("sdafsdkj");
-}
 
 function ApiGateway(uri, method, data) {
 				var request = {
@@ -22,6 +17,3 @@ function ApiGateway(uri, method, data) {
 				};
 				return $.ajax(request);
 }
-
-
-// });

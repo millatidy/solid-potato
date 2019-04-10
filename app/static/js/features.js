@@ -15,7 +15,7 @@ $(document).ready(function() {
 			}
 
 			self.add = function(feature) {
-					self.ajax(self.featuresURI, 'POST', feature).done(function(data) {
+					ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
 							self.features.push({
 									title: ko.observable(data.title),
 									description: ko.observable(data.description),

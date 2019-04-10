@@ -72,6 +72,7 @@ class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
         data = {
             'id': self.id,
             'name': self.name,
+            'no_requests': self.requests.count(),
             'links': {
                 'self': url_for('client', id=self.id),
                 'requests': url_for('get_feature_request', client_id=self.id)

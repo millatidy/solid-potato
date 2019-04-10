@@ -28,8 +28,6 @@
                   <a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a>
                     <button data-bind="click: $parent.beginEdit" type="button"  class="btn btn-primary">Edit</button>
                     <button data-bind="click: $parent.remove" type="button"  class="btn btn-primary">Delete</button>
-                    <span data-bind="visible: noRequests"><button data-bind="click: $parent.markInProgress" type="button"  class="btn btn-primary">Edit Requests</button></span>
-                    <span data-bind="visible: !noRequests()"><button data-bind="click: $parent.markDone" type="button"  class="btn btn-primary">Add Requests</button></span>
                 </td>
             </tr>
           </tbody>
@@ -103,7 +101,6 @@
         </div>
     </div>
 
-    <!-- script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/features.js') }}"></script>
 
 {% endblock %}
