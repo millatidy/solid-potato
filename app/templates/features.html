@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div id="main">
+
+      <div id="newFeatureButton">
+        <button data-bind="click: beginAdd" data-toggle="modal"  class="btn btn-primary">New Feature</button>
+      </div>
+      <br>
+
+        <table id="features" class="table table-hover">
+          <thead>
+            <tr>
+                <td><b>No: Requests</b></td>
+                <td><b>Feature</b></td>
+                <td><b>Options</b></td>
+            </tr>
+          </thead>
+
+            <!-- ko foreach: features -->
+            <tbody>
+            <tr>
+                <td>
+                    <span data-bind="text: noRequests">noRequests</span>
+                </td>
+                <td><p><b data-bind="text: title"></b></p></td>
+                <td>
+                  <a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a>
+                    <button data-bind="click: $parent.beginEdit" type="button"  class="btn btn-primary">Edit</button>
+                    <button data-bind="click: $parent.remove" type="button"  class="btn btn-primary">Delete</button>
+                    <span data-bind="visible: noRequests"><button data-bind="click: $parent.markInProgress" type="button"  class="btn btn-primary">Edit Requests</button></span>
+                    <span data-bind="visible: !noRequests()"><button data-bind="click: $parent.markDone" type="button"  class="btn btn-primary">Add Requests</button></span>
+                </td>
+            </tr>
+          </tbody>
+            
+            <!-- /ko -->
+
+        </table>
+
+    </div>
+
+
+    <div id="add" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="addDialogLabel" class="modal-title">New Feature</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="inputTitle">Feature Title</label>
+                        <input data-bind="value: title" type="text" id="inputTitle" placeholder="Feature Title" class="form-control">
+
+                        <label for="inputDescription">Description</label>
+                        <input data-bind="value: description" type="text" id="inputDescription" placeholder="Description" class="form-control">
+
+                        <label for="inputProductArea">Product Area</label>
+                        <select data-bind="value: productArea" type="text" id="inputProductArea" class="form-control">
+                          <option selected>Choose Product Area</option>
+                          <!-- ko foreach: productAreas -->
+                          <option data-bind="text: name, value: id"></option>
+                          <!-- /ko -->
+                        </select>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click: addFeature" class="btn btn-primary">Add Feature</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editDialogLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="editDialogLabel" class="modal-title">Edit Feature</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="editTitle">Feature Title</label>
+                        <input data-bind="value: title" type="text" id="editTitle" placeholder="Feature Title" class="form-control">
+
+                        <label for="editDescription">Description</label>
+                        <input data-bind="value: description" type="text" id="editDescription" placeholder="Description" class="form-control">
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click: editFeature" class="btn btn-primary">Edit Feature</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/features.js') }}"></script>
+
+{% endblock %}

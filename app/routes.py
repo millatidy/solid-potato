@@ -7,10 +7,18 @@ from datetime import datetime
 
 @app.route('/')
 def index_page():
-    return render_template('index.html')
+    return render_template('features.html')
+
+@app.route('/clients')
+def clients_page():
+    return render_template('clients.html')
+
+@app.route('/feature/<int:id>')
+def feature_deatils_page(id):
+    return render_template('feature_details.html', id=id)
 
 
-@app.route('/clients', methods=['GET', 'POST'])
+@app.route('/api/clients', methods=['GET', 'POST'])
 def clients():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
@@ -24,7 +32,7 @@ def clients():
         client.save()
         return jsonify(client.to_dict())
 
-@app.route('/clients/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/clients/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def client(id):
 
     if id is None:
@@ -49,7 +57,7 @@ def client(id):
         return jsonify(FILE_DELETED)
 
 
-@app.route('/product-areas', methods=['GET', 'POST'])
+@app.route('/api/product-areas', methods=['GET', 'POST'])
 def product_areas():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
@@ -63,7 +71,7 @@ def product_areas():
         product_area.save()
         return jsonify(product_area.to_dict())
 
-@app.route('/product-areas/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/product-areas/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def product_area(id):
     if id is None:
         return jsonify(MISSING_ID)
@@ -82,7 +90,7 @@ def product_area(id):
         db.session.commit()
         return jsonify(FILE_DELETED)
 
-@app.route('/features', methods=['GET', 'POST'])
+@app.route('/api/features', methods=['GET', 'POST'])
 def features():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
@@ -99,7 +107,7 @@ def features():
         feature.save()
         return jsonify(feature.to_dict())
 
-@app.route('/features/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/features/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def feature(id):
     if id is None:
         return jsonify(MISSING_ID)
@@ -120,7 +128,7 @@ def feature(id):
         db.session.commit()
         return jsonify(FILE_DELETED)
 
-@app.route('/feature-requests', methods=['POST'])
+@app.route('/api/feature-requests', methods=['POST'])
 def feature_requests():
     data = request.get_json()
     feature_request = FeatureRequest()
@@ -132,7 +140,7 @@ def feature_requests():
     feature_request.save()
     return jsonify(feature_request.to_dict())
 
-@app.route('/feature-requests', methods=['GET'])
+@app.route('/api/feature-requests', methods=['GET'])
 def get_feature_request():
     feature_id = request.args.get('feature_id', None, type=int)
     client_id = request.args.get('client_id', None, type=int)
@@ -161,7 +169,7 @@ def get_feature_request():
                         client_id=client_id), page, per_page, 'get_feature_request', client_id=client_id)
             return jsonify(data)
 
-@app.route('/feature-requests', methods=['PUT'])
+@app.route('/api/feature-requests', methods=['PUT'])
 def edit_feature_request():
     feature_id = request.args.get('feature_id', None, type=int)
     client_id = request.args.get('client_id', None, type=int)
@@ -182,7 +190,7 @@ def edit_feature_request():
         db.session.commit()
         return jsonify(feature_request.to_dict())
 
-@app.route('/feature-requests', methods=['DELETE'])
+@app.route('/api/feature-requests', methods=['DELETE'])
 def delete_feature_request():
     feature_id = request.args.get('feature_id', None, type=int)
     client_id = request.args.get('client_id', None, type=int)
