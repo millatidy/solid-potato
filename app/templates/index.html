@@ -45,7 +45,6 @@
 										<button data-bind="click: $parent.beginEdit" type="button"  class="btn btn-primary">Edit</button>
 										<button data-bind="click: $parent.remove" type="button"  class="btn btn-primary">Delete</button>
 										<span data-bind="visible: noRequests"><button data-bind="click: $parent.markInProgress" type="button"  class="btn btn-primary">Edit Requests</button></span>
-										<span data-bind="visible: !noRequests()"><button data-bind="click: $parent.markDone" type="button"  class="btn btn-primary">Add Requests</button></span>
 								</td>
 						</tr>
 					</tbody>
@@ -196,11 +195,11 @@
 				</div>
 		</div>
 
-		<div id="editRequest" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+		<div id="editRequest" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editDialogLabel" aria-hidden="true">
 				<div class="modal-dialog" role="document">
 						<div class="modal-content">
 								<div class="modal-header">
-										<h3 id="addDialogLabel" class="modal-title">Edit Feature Request</h3>
+										<h3 id="editDialogLabel" class="modal-title">Edit Feature Request</h3>
 										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 												<span aria-hidden="true">&times;</span>
 										</button>
@@ -208,7 +207,7 @@
 								<div class="modal-body">
 										<form>
 												<label for="editPriority">Priority</label>
-												<select data-bind="value: priority" type="text" id="editPriority" class="form-control">
+												<select data-bind="value: newPriority" type="text" id="editPriority" class="form-control">
 													<option>Select New Priority</option>
 													<option>1</option>
 													<option>2</option>
@@ -218,7 +217,7 @@
 												</select>
 
 												<label for="editTargetDate">New Target Date</label>
-												<input data-bind="value: targetDate" type="text" id="editTargetDate" placeholder="YYYY-MM-DD" class="form-control">
+												<input data-bind="value: newTargetDate" type="text" id="editTargetDate" placeholder="YYYY-MM-DD" class="form-control">
 												
 										</form>
 								</div>
@@ -312,11 +311,11 @@
 				}
 
 				self.markInProgress = function(feature) {
-						feature.done(false);
+						// feature.done(false);
 				}
 
 				self.markDone = function(feature) {
-						feature.done(true);
+						// feature.done(true);
 				}
 
 				// Get features
@@ -426,7 +425,7 @@
 			self.clients = ko.observableArray();
 
 			self.beginAdd = function() {
-				addFeatureRequestViewModel.initialize(self.id, self.clients);
+				addFeatureRequestViewModel.initializeAdd(self.id, self.clients);
 				$('#addRequest').modal('show');
 			}
 
@@ -443,7 +442,7 @@
 			}
 
 			self.beginEdit = function(featureRequest) {
-				editFeatureRequestViewModel.initialize(self.id, self.clients);
+				editFeatureRequestViewModel.initialize(self.id);
 				editFeatureRequestViewModel.setFeatureRequest(featureRequest);
 				$('#editRequest').modal('show');
 			}
@@ -482,14 +481,14 @@
 		}
 
 		function AddFeatureRequestViewModel() {
-			self = this;
+			var self = this;
 			self.featureID = ko.observable();
 			self.clientID = ko.observable();
 			self.priority = ko.observable();
 			self.targetDate = ko.observable();
 			self.clients = ko.observableArray();
 
-			self.initialize = function(featureID, clients) {
+			self.initializeAdd = function(featureID, clients) {
 				self.featureID(featureID());
 				self.clients(clients());
 			}
@@ -509,23 +508,25 @@
 		}
 
 		function EditFeatureRequestViewModel() {
-			self = this;
+			var self = this;
 			self.featureID = ko.observable();
 			self.clientID = ko.observable();
-			self.priority = ko.observable();
-			self.targetDate = ko.observable();
-			self.clients = ko.observableArray();
+			self.newPriority = ko.observable();
+			self.newTargetDate = ko.observable();
 
-			self.initialize = function(featureID, clients) {
+			self.initialize = function(featureID) {
 				self.featureID(featureID());
-				self.clients(clients());
 			}
 
 			self.setFeatureRequest = function(featureRequest) {
 				self.featureID(featureRequest.featureID());
 				self.clientID(featureRequest.clientID());
-				self.priority(featureRequest.priority());
-				self.targetDate(featureRequest.targetDate());
+				self.newPriority(featureRequest.priority());
+				self.newTargetDate(featureRequest.targetDate());
+			}
+
+			self.editRequest = function() {
+				alert("where did i go?");
 			}
 		}
 
@@ -545,3 +546,4 @@
 
 		</script>
 </body>
+</html>

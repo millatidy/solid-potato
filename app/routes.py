@@ -123,6 +123,7 @@ def feature(id):
 @app.route('/feature-requests', methods=['POST'])
 def feature_requests():
     data = request.get_json()
+    print(data)
     feature_request = FeatureRequest()
     feature_request.feature_id = data['feature_id']
     feature_request.client_id = data['client_id']
