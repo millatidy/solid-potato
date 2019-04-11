@@ -7,3 +7,6 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL') or \
+    'http://localhost:9200'
+    

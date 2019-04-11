@@ -1,4 +1,5 @@
 from app import db
+from app.search import add_to_index, remove_from_index, query_index
 from flask import abort, url_for
 from datetime import datetime, timedelta
 
@@ -14,12 +15,6 @@ class DAO(object):
     def save(self):
         db.session.add(self)
         db.session.commit()
-
-    # def update(self):
-    #     old = self.query.get(self.id)
-    #     old = self
-    #     db.session.commit()
-    #     return old
 
     def delete(self):
         self = self.query.get(self.id)
@@ -38,6 +33,44 @@ class DAO_UNIQUE_NAME(DAO):
         if self.query.filter_by(name=self.name).count() > 0:
             return False
         return True
+
+class SearchableMixin(object):
+    @classmethod
+    def search(cls, expression, page, per_page):
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+        if total == 0:
+            return cls.query.filter_by(id=0), 0
+        when = []
+        for i in range(len(ids)):
+            when.append((ids[i], i))
+        return cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)), total 
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
+
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes['add']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['update']:
+            if isinstance(obj.__tablename__, obj):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['delete']:
+            if isinstance(obj, SearchableMixin):
+                remove_from_index(obj.__tablename__, obj)
+        session._changes = None
+
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            add_to_index(cls.__tablename__, obj)
 
 class PaginatedAPIMixin(object):
     @staticmethod
@@ -96,7 +129,8 @@ class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
         return data
 
 
-class Feature(PaginatedAPIMixin, DAO, db.Model):
+class Feature(SearchableMixin, PaginatedAPIMixin, DAO, db.Model):
+    __searchable__ =['title', 'description']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
@@ -151,3 +185,6 @@ class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
             }
         }
         return data
+
+db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)

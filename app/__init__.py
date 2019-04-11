@@ -1,27 +1,45 @@
-from flask import Flask 
+from flask import Flask , current_app
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate 
 from flask_cors import CORS
-# from flask_mail import Mail
+from elasticsearch import Elasticsearch
 from raven.contrib.flask import Sentry
 
-app = Flask(__name__, static_url_path = "")
-app.config.from_object(Config)
+db = SQLAlchemy()
+migrate = Migrate()
+cors = CORS()
+sentry = Sentry()
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-cors = CORS(app, resources={r"/*": {
+def create_app(config_class=Config):
+	app = Flask(__name__)
+	app.config.from_object(config_class)
+
+	db.init_app(app)
+	migrate.init_app(app)
+	cors.init_app(app, resources={r"/*": {
 									"origins": [
 										"http://0.0.0.0:5000"
 										]
 									}
-								}
-							)
-# mail = Mail(app)
+								})
 
-if not app.debug:
-	# Sentry
-	sentry = Sentry(app, dsn='https://f70b58dfecda4089b51567122c36a881:4fcb5bf1b52f4ddc974db998dc3f1fd2@sentry.io/1292364')
+	from app.main import bp as main_bp
+	app.register_blueprint(main_bp)
 
-from app import routes, models, messages
+	# from app.errors import bp as msg_bp
+	# app.register_blueprint(msg_bp)
+	print("SADKJASJK")
+
+
+	app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+	if app.config['ELASTICSEARCH_URL'] else None
+
+
+	if not app.debug:
+		# Sentry
+		sentry.init_app(app, dsn='https://f70b58dfecda4089b51567122c36a881:4fcb5bf1b52f4ddc974db998dc3f1fd2@sentry.io/1292364')
+
+	return app
+
+from app import models, messages
