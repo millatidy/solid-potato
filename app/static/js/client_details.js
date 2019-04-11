@@ -30,6 +30,7 @@ $(document).ready(function () {
 					self.requests.push({
 						featureID: ko.observable(data.items[i].feature_id),
 						clientID: ko.observable(data.items[i].client_id),
+						featureTitle: ko.observable(data.items[i].feature_title),
 						priority: ko.observable(data.items[i].priority),
 						targetDate: ko.observable(data.items[i].target_date),
 						uri: ko.observable(data.items[i].links.self)

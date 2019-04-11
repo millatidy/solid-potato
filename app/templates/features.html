@@ -3,9 +3,14 @@
 {% block content %}
     <div id="main">
 
+    <!-- <div id="top" class="row"> -->
       <div id="newFeatureButton">
         <button data-bind="click: beginAdd" data-toggle="modal"  class="btn btn-primary">New Feature</button>
       </div>
+      <div>
+      {% include 'paginate.html' %}
+    <!-- </div> -->
+  </div>
       <br>
 
         <table id="features" class="table table-hover">

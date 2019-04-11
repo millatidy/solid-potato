@@ -4,7 +4,7 @@ $(document).ready(function() {
 		var self = this;
 		self.api = "http://localhost:5000/api"
 		self.clientsURI = self.api + "/clients";
-		self.productAreasURI = self.api + "/product-areas";
+		
 		self.id = ko.observable(location.pathname.split("/")[2]);
 		self.requestURI = self.api + "/features/" + self.id();
 		self.featureRequestsURI = self.api + "/feature-requests" + "?feature_id=" + self.id();
@@ -26,13 +26,13 @@ $(document).ready(function() {
 		}
 
 		self.add = function(featureRequest) {
-			$('#addRequest').modal('hide');
 			ApiGateway(self.requestsURI(), 'POST', featureRequest).done(function(data) {
 							self.requests.push({
 									featureID: ko.observable(data.feature_id),
 									clientID: ko.observable(data.client_id),
 									priority: ko.observable(data.priority),
-									targetDate: ko.observable(data.target_date)
+									targetDate: ko.observable(data.target_date),
+									clientName: ko.observable(data.client_name)
 							});
 					});
 		}
@@ -85,21 +85,7 @@ $(document).ready(function() {
 				});
 		}
 
-		self.getProducts = function() {
-			ApiGateway(self.productAreasURI, 'GET').done(
-				function(data) {
-					for (var i = 0; i < data.items.length; i++) {
-						self.prodcuts.push({
-						id: ko.observable(data.items[i].id),
-						name: ko.observable(data.items[i].name),
-						uri: ko.observable(data.items[i].links.self)
-						});
-					}
-				});
-		}
-
 		self.getRequests = function() {
-			console.log(self.featureRequestsURI);
 			ApiGateway(self.featureRequestsURI, 'GET').done(
 				function(data) {
 					for (var i = 0;  i < data.items.length; i++) {
@@ -108,7 +94,8 @@ $(document).ready(function() {
 							clientID: ko.observable(data.items[i].client_id),
 							priority: ko.observable(data.items[i].priority),
 							targetDate: ko.observable(data.items[i].target_date),
-							uri: ko.observable(data.items[i].links.self)
+							uri: ko.observable(data.items[i].links.self),
+							clientName: ko.observable(data.items[i].client_name)
 						});
 					}
 
@@ -117,10 +104,6 @@ $(document).ready(function() {
 
 		// Get Feature Detials
 		self.getRequest();
-
-		// Get Products
-		self.getProducts();
-
 
 		// Load Clients
 		self.getClients();
@@ -144,6 +127,7 @@ $(document).ready(function() {
 		}
 
 		self.addRequest = function() {
+			$('#addRequest').modal('hide');
 			featureDetailsViewModel.add({
 				feature_id: self.featureID(),
 				client_id: self.clientID(),
@@ -154,6 +138,7 @@ $(document).ready(function() {
 			self.clientID("");
 			self.priority("");
 			self.targetDate("");
+			console.log("cleaned up");
 		}
 	}
 

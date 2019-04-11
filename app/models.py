@@ -142,6 +142,8 @@ class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
             'client_id': self.client_id,
             'priority': self.priority,
             'target_date': self.target_date,
+            'feature_title': self.feature.title,
+            'client_name': self.client.name,
             'links': {
                 'self': url_for('get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
                 'feature': url_for('feature', id=self.feature_id),

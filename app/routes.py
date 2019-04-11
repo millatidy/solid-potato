@@ -99,7 +99,7 @@ def features():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)
-        data = Feature.to_collection_dict(Feature.query, page, per_page, 'features')
+        data = Feature.to_collection_dict(Feature.query.order_by(Feature.id.desc()), page, per_page, 'features')
         return jsonify(data)
     else:
         data = request.get_json()

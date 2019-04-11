@@ -17,3 +17,11 @@ function ApiGateway(uri, method, data) {
 				};
 				return $.ajax(request);
 }
+
+function Paginate(page, perPage, itemsLength) {
+
+	var itemsRangeMin = (page-1)*perPage + 1;
+	var itemsRangeMax = (page-1)*perPage + itemsLength;
+
+	return [itemsRangeMin, itemsRangeMax];
+}

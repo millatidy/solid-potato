@@ -2,12 +2,22 @@ $(document).ready(function() {
 
 	function FeaturesViewModel() {
 			var self = this;
-			self.api = "http://localhost:5000/api"
-			self.featuresURI = self.api + "/features";
+			self.api = "http://localhost:5000"
+			self.featuresURI = self.api + "/api/features";
+			self.productAreasURI = self.api + "/api/product-areas";
 			self.features = ko.observableArray();
 			self.productAreas = ko.observableArray();
 			self.clients = ko.observableArray();
 			self.featureRequests = ko.observableArray();
+
+			self.currentPage = ko.observable();
+			self.min = ko.observable();
+			self.max = ko.observable();
+			self.totalItems = ko.observable();
+			self.maxItems = ko.observable();
+
+			self.nextFeaturesURI = ko.observable();
+			self.prevFeaturesURI = ko.observable();
 
 			self.beginAdd = function() {
 				addFeatureModel.setProductAreas(self.productAreas)
@@ -15,13 +25,25 @@ $(document).ready(function() {
 			}
 
 			self.add = function(feature) {
-					ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
-							self.features.push({
-									title: ko.observable(data.title),
-									description: ko.observable(data.description),
-									product_area_id: ko.observable(data.product_area_id)
-							});
-					});
+				ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
+					if (self.currentPage() == 1) {
+						self.features.unshift({
+								id: ko.observable(data.id),
+								title: ko.observable(data.title),
+								description: ko.observable(data.description),
+								uri: ko.observable(data.links.self),
+								product_area_id: ko.observable(data.product_area_id),
+								productAreaURI: ko.observable(data.links.product_area),
+								requestsURI: ko.observable(data.links.requests),
+								noRequests: ko.observable(data.no_requests),
+								url: ko.observable("/feature/" + data.id)
+						});
+						if (self.features().length >= self.maxItems()) {
+							self.features.splice(-1,1);
+						}
+					}
+					self.totalItems(self.totalItems() + 1);
+				});
 			}
 
 			self.beginEdit = function(feature) {
@@ -30,7 +52,7 @@ $(document).ready(function() {
 			}
 
 			self.edit = function(feature, data) {
-					self.ajax(feature.uri(), 'PUT', data).done(function(res) {
+					ApiGateway(feature.uri(), 'PUT', data).done(function(res) {
 							self.updateFeature(feature, res);
 					})
 			}
@@ -44,23 +66,28 @@ $(document).ready(function() {
 			};
 
 			self.remove = function(feature) {
-					self.ajax(feature.uri(), 'DELETE').done(function() {
+					ApiGateway(feature.uri(), 'DELETE').done(function() {
 							self.features.remove(feature);
 					});
 			}
 
-			self.markInProgress = function(feature) {
-					feature.done(false);
-			}
-
-			self.markDone = function(feature) {
-					feature.done(true);
-			}
-
-			self.getFeatures = function() {
-				ApiGateway(self.featuresURI, 'GET').done(
+			self.loadPrev = function() {
+				ApiGateway(self.prevFeaturesURI(), 'GET').done(
 					function(data) {
-					for (var i = 0; i < data.items.length; i++) {
+						self.loadFeaures(data);
+				});
+			}
+
+			self.loadNext = function() {
+				ApiGateway(self.nextFeaturesURI(), 'GET').done(
+					function(data) {
+						self.loadFeaures(data);
+				});
+			}
+
+			self.loadFeaures = function(data) {
+				self.features([]);
+				for (var i = 0; i < data.items.length; i++) {
 							self.features.push({
 								id: ko.observable(data.items[i].id),
 									title: ko.observable(data.items[i].title),
@@ -73,11 +100,46 @@ $(document).ready(function() {
 									url: ko.observable("/feature/" + data.items[i].id)
 							});
 					}
-			});
+					var page = data._meta.page;
+					var per_page = data._meta.per_page;
+					self.totalItems(data._meta.total_items)
+					self.maxItems(per_page);
+					self.currentPage(page);
+					
+					var paginate = Paginate(data._meta.page, data._meta.per_page, data.items.length);
+
+					self.min(paginate[0]);
+					self.max(paginate[1]);
+
+					self.nextFeaturesURI(self.api+data._links.next);
+					self.prevFeaturesURI(self.api+data._links.prev);
 			}
 
+			self.getFeatures = function() {
+				ApiGateway(self.featuresURI, 'GET').done(
+					function(data) {
+						self.loadFeaures(data);
+				});
+			}
 
-			self.getFeatures();
+			self.getProducts = function() {
+			ApiGateway(self.productAreasURI, 'GET').done(
+				function(data) {
+					for (var i = 0; i < data.items.length; i++) {
+						self.productAreas.push({
+						id: ko.observable(data.items[i].id),
+						name: ko.observable(data.items[i].name),
+						uri: ko.observable(data.items[i].links.self)
+						});
+					}
+				});
+		}
+
+		// Get Features
+		self.getFeatures();
+
+		// Get Products
+		self.getProducts();
 	}
 
 	function AddFeatureViewModel() {
@@ -131,6 +193,19 @@ $(document).ready(function() {
 
 	}
 
+	function PaginateViewModel() {
+		var self = this;
+		self.min = ko.observable();
+		self.max = ko.observable();
+		self.totalItems = ko.observable();
+
+		self.init = function(paginate, totalItems) {
+			self.min(paginate[0]);
+			self.max(paginate[1]);
+			self.totalItems(totalItems);
+		}
+
+	}
 
 	var featuresViewModel = new FeaturesViewModel();
 	var addFeatureModel = new AddFeatureViewModel();
