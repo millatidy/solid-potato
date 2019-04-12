@@ -1,5 +1,4 @@
 Flask_SQLAlchemy==2.3.2
-cryptography==1.8.1
 Flask_Cors==3.0.2
 SQLAlchemy==1.1.9
 Flask_Migrate==2.4.0
@@ -7,4 +6,4 @@ Flask==0.12.2
 raven==6.10.0
 alembic==1.0.8
 elasticsearch==6.3.1
-psycopg2-binary
+psycopg2
