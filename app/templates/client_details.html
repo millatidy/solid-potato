@@ -1,34 +1,32 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <div id="client-detail">
-  <h3 data-bind="text: name"></h3>
+    <h3 data-bind="text: name"></h3>
 
-  <table id="feature-requests" class="table table-hover">
-    <thead>
-      <tr>
-        <td><b>Feature Title</b></td>
-        <td><b>Priority</b></td>
-        <td><b>Target Date</b></td>
-        <td><b>Options</b></td>
-      </td>
-    </thead>
-    <tbody>
-      <!-- ko foreach: requests -->
-      <tr>
-        <td data-bind="text: featureTitle"></td>
-        <td data-bind="text: priority"></td>
-        <td data-bind="text: targetDate"></td>
-        <td>
-          <button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
-          <button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
-        </td>
-      </tr>
-      <!-- /ko -->
-    </tbody>
+    <table id="feature-requests" class="table table-hover">
+        <thead>
+            <tr>
+                <td><b>Feature Title</b></td>
+                <td><b>Priority</b></td>
+                <td><b>Target Date</b></td>
+                <td><b>Options</b></td>
+                </td>
+        </thead>
+        <tbody>
+            <!-- ko foreach: requests -->
+            <tr>
+                <td data-bind="text: featureTitle"></td>
+                <td data-bind="text: priority"></td>
+                <td data-bind="text: targetDate"></td>
+                <td>
+                    <button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
+                    <button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
+                </td>
+            </tr>
+            <!-- /ko -->
+        </tbody>
 
-  </table>
+    </table>
 
 </div>
 

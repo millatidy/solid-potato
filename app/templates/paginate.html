@@ -1,25 +1,25 @@
 {% block paginate %}
 <div id="paginate" class="float-right">
-  <nav aria-label="Page navigation example">
-    <ul class="pagination">
-      <span data-bind="text: min"></span>
-        -
-      <span data-bind="text: max"></span>
-      <span> of </span>
-      <span data-bind="text: totalItems"></span>
-      <br>
-      <li class="page-item">
-        <!-- <a data-bind="attr: { href: url_prev, title: previous }" class="page-link" aria-label="Previous"> -->
-        <a data-bind="click: loadPrev" class="page-link" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>      <li class="page-item">
-        <!-- <a data-bind="attr: { href: url, title: next }" class="page-link" aria-label="Next"> -->
-        <a data-bind="click: loadNext" class="page-link" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <span data-bind="text: min"></span> -
+            <span data-bind="text: max"></span>
+            <span> of </span>
+            <span data-bind="text: totalItems"></span>
+            <br>
+            <li class="page-item">
+                <!-- <a data-bind="attr: { href: url_prev, title: previous }" class="page-link" aria-label="Previous"> -->
+                <a data-bind="click: loadPrev" class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <!-- <a data-bind="attr: { href: url, title: next }" class="page-link" aria-label="Next"> -->
+                <a data-bind="click: loadNext" class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 {% endblock %}

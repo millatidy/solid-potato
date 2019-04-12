@@ -1,25 +1,25 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div id="search-results">
+    <h3>Results for query: <span data-bind="text: query"></span></h3>
+    <table id="results" class="table table-hover">
+        <thead>
+            <tbody>
+                <!-- ko foreach: results -->
+                <tr>
+                    <td>
+                        <span><b data-bind="text: title"></b></span>
+                        <td><b data-bind="text: productArea"></b></td>
+                        <td>
+                            <p data-bind="text: description"></p>
+                        </td>
+                        <td><a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a></td>
+                    </td>
+                </tr>
+                <!-- /ko -->
+            </tbody>
+    </table>
+</div>
 
-{% block content %}
-    <div id="search-results">
-    	<h3>Results for query: <span data-bind="text: query"></span></h3>
-    	<table id="results" class="table table-hover">
-    		<thead>
-    		<tbody>
-    			<!-- ko foreach: results -->
-    			<tr>
-    				<td>
-    					<span><b data-bind="text: title"></b></span>
-    					<td><b data-bind="text: productArea"></b></td>
-	    				<td><p data-bind="text: description"></p></td>
-    					<td><a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a></td>
-    				</td>
-    			</tr>
-    			<!-- /ko -->
-    		</tbody>
-    	</table>
-    </div>
-
-    <script type="text/javascript" src="{{ url_for('static', filename='js/search_results.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/search_results.js') }}"></script>
 
 {% endblock %}

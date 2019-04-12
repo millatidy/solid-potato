@@ -5,15 +5,15 @@ from app.models import *
 from app.messages import *
 from app.api import bp
 
+
 @bp.route('/search')
 def search():
     per_page = min(request.args.get('per_page', 10, type=int), 100)
     page = request.args.get('page', 1, type=int)
     query = request.args.get('q')
     features_query, total = Feature.search(query, page, 10)
-    features = Feature.to_collection_dict(features_query, page, per_page, 'api.features')
-    # print(features)
-    # print(total)
+    features = Feature.to_collection_dict(
+        features_query, page, per_page, 'api.features')
     return jsonify(features)
 
 
@@ -22,7 +22,8 @@ def clients():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)
-        data = Client.to_collection_dict(Client.query, page, per_page, 'api.clients')
+        data = Client.to_collection_dict(
+            Client.query, page, per_page, 'api.clients')
         return jsonify(data)
     else:
         data = request.get_json()
@@ -31,26 +32,21 @@ def clients():
         client.save()
         return jsonify(client.to_dict())
 
+
 @bp.route('/clients/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def client(id):
-
     if id is None:
         return jsonify(MISSING_ID)
-
     client = Client.query.get(id)
-
     if client is None:
-            return jsonify(OBJECT_NOT_FOUND)
-
+        return jsonify(OBJECT_NOT_FOUND)
     if request.method == 'GET':
         return jsonify(client.to_dict())
-
     elif request.method == 'PUT':
         data = request.get_json()
         client.name = data['name']
         db.session.commit()
         return jsonify(client.to_dict())
-
     else:
         db.session.delete(client)
         return jsonify(FILE_DELETED)
@@ -61,7 +57,8 @@ def product_areas():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)
-        data = ProductArea.to_collection_dict(ProductArea.query, page, per_page, 'api.product_areas')
+        data = ProductArea.to_collection_dict(
+            ProductArea.query, page, per_page, 'api.product_areas')
         return jsonify(data)
     else:
         data = request.get_json()
@@ -70,31 +67,39 @@ def product_areas():
         product_area.save()
         return jsonify(product_area.to_dict())
 
+
 @bp.route('/product-areas/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def product_area(id):
     if id is None:
         return jsonify(MISSING_ID)
+
     product_area = ProductArea.query.get(id)
+
     if product_area is None:
         return jsonify(OBJECT_NOT_FOUND)
+
     if request.method == 'GET':
         return jsonify(product_area.to_dict())
+
     elif request.method == 'PUT':
         data = request.get_json()
         product_area.name = data['name']
         db.session.commit()
         return jsonify(product_area.to_dict())
+
     else:
         db.session.delete(product_area)
         db.session.commit()
         return jsonify(FILE_DELETED)
+
 
 @bp.route('/features', methods=['GET', 'POST'])
 def features():
     if request.method == 'GET':
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)
-        data = Feature.to_collection_dict(Feature.query.order_by(Feature.id.desc()), page, per_page, 'api.features')
+        data = Feature.to_collection_dict(Feature.query.order_by(
+            Feature.id.desc()), page, per_page, 'api.features')
         return jsonify(data)
     else:
         data = request.get_json()
@@ -104,6 +109,7 @@ def features():
         feature.product_area_id = data['product_area_id']
         feature.save()
         return jsonify(feature.to_dict())
+
 
 @bp.route('/features/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def feature(id):
@@ -126,6 +132,7 @@ def feature(id):
         db.session.commit()
         return jsonify(FILE_DELETED)
 
+
 @bp.route('/feature-requests', methods=['POST'])
 def feature_requests():
     data = request.get_json()
@@ -134,9 +141,11 @@ def feature_requests():
     feature_request.client_id = data['client_id']
     feature_request.priority = data['priority']
     time_arr = data['target_date'].split("-")
-    feature_request.target_date = datetime(int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
+    feature_request.target_date = datetime(
+        int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
     feature_request.save()
     return jsonify(feature_request.to_dict())
+
 
 @bp.route('/feature-requests', methods=['GET'])
 def get_feature_request():
@@ -145,7 +154,8 @@ def get_feature_request():
     if (feature_id is None) and (client_id is None):
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)
-        data = FeatureRequest.to_collection_dict(FeatureRequest.query, page, per_page, 'api.feature_requests')
+        data = FeatureRequest.to_collection_dict(
+            FeatureRequest.query, page, per_page, 'api.feature_requests')
         return jsonify(data)
     if request.method == 'GET':
         if feature_id and client_id:
@@ -160,12 +170,21 @@ def get_feature_request():
             if feature_id:
                 data = FeatureRequest.to_collection_dict(
                     FeatureRequest.query.filter_by(
-                        feature_id=feature_id), page, per_page, 'api.get_feature_request', feature_id=feature_id)
+                        feature_id=feature_id),
+                    page,
+                    per_page,
+                    'api.get_feature_request',
+                    feature_id=feature_id)
             else:
                 data = FeatureRequest.to_collection_dict(
                     FeatureRequest.query.filter_by(
-                        client_id=client_id), page, per_page, 'api.get_feature_request', client_id=client_id)
+                        client_id=client_id),
+                    page,
+                    per_page,
+                    'api.get_feature_request',
+                    client_id=client_id)
             return jsonify(data)
+
 
 @bp.route('/feature-requests', methods=['PUT'])
 def edit_feature_request():
@@ -174,7 +193,7 @@ def edit_feature_request():
     if (feature_id is None) and (client_id is None):
         return jsonify({'message': 'feature_id and client_id cannot be empty'})
     if (feature_id is None) or (client_id is None):
-            return jsonify(MISSING_ID)
+        return jsonify(MISSING_ID)
     if request.method == 'PUT':
         data = request.get_json()
         feature_request = FeatureRequest()
@@ -182,11 +201,12 @@ def edit_feature_request():
         feature_request.client_id = data['client_id']
         feature_request = feature_request.query.get((feature_id, client_id))
         time_arr = data['target_date'].split("-")
-        feature_request.target_date = datetime(int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
+        feature_request.target_date = datetime(
+            int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
         feature_request.priority = data['priority']
-        # feature_request.query.get((feature_id, client_id))
         db.session.commit()
         return jsonify(feature_request.to_dict())
+
 
 @bp.route('/feature-requests', methods=['DELETE'])
 def delete_feature_request():
@@ -195,13 +215,9 @@ def delete_feature_request():
     if (feature_id is None) and (client_id is None):
         return jsonify({'message': 'feature_id and client_id cannot be empty'})
     if (feature_id is None) or (client_id is None):
-            return jsonify(MISSING_ID)
+        return jsonify(MISSING_ID)
     if request.method == 'DELETE':
-        # data = request.get_json()
-        # feature_id = data['feature_id']
-        # client_id = data['client_id']
         feature_request = FeatureRequest().query.get((feature_id, client_id))
         db.session.delete(feature_request)
         db.session.commit()
         return jsonify(FILE_DELETED)
-

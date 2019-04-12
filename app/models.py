@@ -3,48 +3,19 @@ from app.search import add_to_index, remove_from_index, query_index
 from flask import abort, url_for
 from datetime import datetime, timedelta
 
-class DAO(object):
-
-    @classmethod        
-    def find_all(cls):
-        return cls.query.all()
-
-    def find_one(self, id):
-        return self.query.get(id)
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        self = self.query.get(self.id)
-        db.session.delete(self)
-        db.session.commit()
-
-class DAO_UNIQUE_NAME(DAO):
-
-    def save(self):
-        if not self.is_unique():
-            self.name += "_1"
-        db.session.add(self)
-        db.session.commit()    
-
-    def is_unique(self):
-        if self.query.filter_by(name=self.name).count() > 0:
-            return False
-        return True
 
 class SearchableMixin(object):
+
     @classmethod
     def search(cls, expression, page, per_page):
         ids, total = query_index(cls.__tablename__, expression, page, per_page)
-        if total == 0:
+        if total['value'] == 0:
             return cls.query.filter_by(id=0), 0
         when = []
         for i in range(len(ids)):
             when.append((ids[i], i))
         return cls.query.filter(cls.id.in_(ids)).order_by(
-            db.case(when, value=cls.id)), total 
+            db.case(when, value=cls.id)), total
 
     @classmethod
     def before_commit(cls, session):
@@ -72,7 +43,9 @@ class SearchableMixin(object):
         for obj in cls.query:
             add_to_index(cls.__tablename__, obj)
 
+
 class PaginatedAPIMixin(object):
+
     @staticmethod
     def to_collection_dict(query, page, per_page, endpoint, **kwargs):
         resources = query.paginate(page, per_page, False)
@@ -96,10 +69,15 @@ class PaginatedAPIMixin(object):
         return data
 
 
-class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
+class Client(PaginatedAPIMixin, db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
-    requests = db.relationship('FeatureRequest', cascade='all, delete, delete-orphan', lazy='dynamic', backref='client')
+    requests = db.relationship(
+        'FeatureRequest',
+        cascade='all, delete, delete-orphan',
+        lazy='dynamic',
+        backref='client')
 
     def to_dict(self):
         data = {
@@ -107,17 +85,24 @@ class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
             'name': self.name,
             'no_requests': self.requests.count(),
             'links': {
-                'self': url_for('api.client', id=self.id),
-                'requests': url_for('api.get_feature_request', client_id=self.id)
-            }
-        }
+                'self': url_for(
+                    'api.client',
+                    id=self.id),
+                'requests': url_for(
+                    'api.get_feature_request',
+                    client_id=self.id)}}
         return data
 
 
-class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
+class ProductArea(PaginatedAPIMixin, db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
-    features = db.relationship('Feature', cascade='all, delete, delete-orphan', lazy='dynamic', backref='product_area')
+    features = db.relationship(
+        'Feature',
+        cascade='all, delete, delete-orphan',
+        lazy='dynamic',
+        backref='product_area')
 
     def to_dict(self):
         data = {
@@ -130,19 +115,27 @@ class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
         return data
 
 
-class Feature(SearchableMixin, PaginatedAPIMixin, DAO, db.Model):
-    __searchable__ =['title', 'description']
+class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
+
+    __searchable__ = ['title', 'description']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
-    product_area_id = db.Column(db.Integer, db.ForeignKey('product_area.id'), nullable=False)
-    requests = db.relationship('FeatureRequest', cascade='all, delete, delete-orphan', lazy='dynamic', backref='feature')
+    product_area_id = db.Column(
+        db.Integer,
+        db.ForeignKey('product_area.id'),
+        nullable=False)
+    requests = db.relationship(
+        'FeatureRequest',
+        cascade='all, delete, delete-orphan',
+        lazy='dynamic',
+        backref='feature')
 
     def save(self):
         if not self.is_unique():
             self.title += "_1"
         db.session.add(self)
-        db.session.commit()    
+        db.session.commit()
 
     def is_unique(self):
         if self.query.filter_by(title=self.title).count() > 0:
@@ -158,19 +151,34 @@ class Feature(SearchableMixin, PaginatedAPIMixin, DAO, db.Model):
             'no_requests': self.requests.count(),
             'product_area': self.product_area.name,
             'links': {
-                'self': url_for('api.feature', id=self.id),
-                'product_area':url_for('api.product_area', id=self.product_area_id),
-                'requests': url_for('api.get_feature_request', feature_id=self.id)
-            }
-        }
+                'self': url_for(
+                    'api.feature',
+                    id=self.id),
+                'product_area': url_for(
+                    'api.product_area',
+                    id=self.product_area_id),
+                'requests': url_for(
+                    'api.get_feature_request',
+                    feature_id=self.id)}}
         return data
 
 
-class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
-    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'), primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+class FeatureRequest(PaginatedAPIMixin, db.Model):
+
+    feature_id = db.Column(
+        db.Integer,
+        db.ForeignKey('feature.id'),
+        primary_key=True)
+    client_id = db.Column(
+        db.Integer,
+        db.ForeignKey('client.id'),
+        primary_key=True)
     priority = db.Column(db.Integer)
-    target_date = db.Column(db.DateTime(), default=datetime.utcnow() + timedelta(days=90))
+    target_date = db.Column(
+        db.DateTime(),
+        default=datetime.utcnow() +
+        timedelta(
+            days=90))
 
     def to_dict(self):
         data = {
@@ -181,12 +189,18 @@ class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
             'feature_title': self.feature.title,
             'client_name': self.client.name,
             'links': {
-                'self': url_for('api.get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
-                'feature': url_for('api.feature', id=self.feature_id),
-                'client': url_for('api.client', id=self.client_id)
-            }
-        }
+                'self': url_for(
+                    'api.get_feature_request',
+                    feature_id=self.feature_id,
+                    client_id=self.client_id),
+                'feature': url_for(
+                    'api.feature',
+                    id=self.feature_id),
+                'client': url_for(
+                    'api.client',
+                    id=self.client_id)}}
         return data
+
 
 db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
 db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
