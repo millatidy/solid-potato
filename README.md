@@ -9,7 +9,7 @@ cd solid-potato
 
 pip install requirements.txt
 
-export FLASK_APP=app.py
+export FLASK_APP=solid_potato.py
 
 if you want to run in debugging mode
 
