@@ -143,7 +143,8 @@ def feature_requests():
     time_arr = data['target_date'].split("-")
     feature_request.target_date = datetime(
         int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
-    feature_request.save()
+    db.session.add(feature_request)
+    db.session.commit()
     return jsonify(feature_request.to_dict())
 
 
