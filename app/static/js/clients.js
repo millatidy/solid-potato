@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     function ClientsViewModel() {
         var self = this;
-        self.clientsURI = "http://localhost:5000/api/clients";
+        self.clientsURI = "http://localhost:6000/api/clients";
         self.clients = ko.observableArray();
 
         self.getClients = function() {

@@ -16,7 +16,7 @@ def create_app(config_class=Config):
 	app.config.from_object(config_class)
 
 	db.init_app(app)
-	migrate.init_app(app)
+	migrate.init_app(app, db)
 	cors.init_app(app, resources={r"/*": {
 									"origins": [
 										"http://0.0.0.0:5000"
