@@ -107,8 +107,8 @@ class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
             'name': self.name,
             'no_requests': self.requests.count(),
             'links': {
-                'self': url_for('client', id=self.id),
-                'requests': url_for('get_feature_request', client_id=self.id)
+                'self': url_for('api.client', id=self.id),
+                'requests': url_for('api.get_feature_request', client_id=self.id)
             }
         }
         return data
@@ -123,7 +123,7 @@ class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
             'id': self.id,
             'name': self.name,
             'links': {
-                'self': url_for('product_area', id=self.id),
+                'self': url_for('api.product_area', id=self.id),
             }
         }
         return data
@@ -156,9 +156,9 @@ class Feature(SearchableMixin, PaginatedAPIMixin, DAO, db.Model):
             'product_area_id': self.product_area_id,
             'no_requests': self.requests.count(),
             'links': {
-                'self': url_for('feature', id=self.id),
-                'product_area':url_for('product_area', id=self.product_area_id),
-                'requests': url_for('get_feature_request', feature_id=self.id)
+                'self': url_for('api.feature', id=self.id),
+                'product_area':url_for('api.product_area', id=self.product_area_id),
+                'requests': url_for('api.get_feature_request', feature_id=self.id)
             }
         }
         return data
@@ -179,9 +179,9 @@ class FeatureRequest(PaginatedAPIMixin, DAO, db.Model):
             'feature_title': self.feature.title,
             'client_name': self.client.name,
             'links': {
-                'self': url_for('get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
-                'feature': url_for('feature', id=self.feature_id),
-                'client': url_for('client', id=self.client_id)
+                'self': url_for('api.get_feature_request', feature_id=self.feature_id, client_id=self.client_id),
+                'feature': url_for('api.feature', id=self.feature_id),
+                'client': url_for('api.client', id=self.client_id)
             }
         }
         return data

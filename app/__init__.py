@@ -29,7 +29,10 @@ def create_app(config_class=Config):
 
 	# from app.errors import bp as msg_bp
 	# app.register_blueprint(msg_bp)
-	print("SADKJASJK")
+	
+
+	from app.api import bp as api_bp
+	app.register_blueprint(api_bp, url_prefix="/api")
 
 
 	app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
