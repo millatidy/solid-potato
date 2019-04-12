@@ -133,21 +133,6 @@ def feature(id):
         return jsonify(FILE_DELETED)
 
 
-@bp.route('/feature-requests', methods=['POST'])
-def feature_requests():
-    data = request.get_json()
-    feature_request = FeatureRequest()
-    feature_request.feature_id = data['feature_id']
-    feature_request.client_id = data['client_id']
-    feature_request.priority = data['priority']
-    time_arr = data['target_date'].split("-")
-    feature_request.target_date = datetime(
-        int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
-    db.session.add(feature_request)
-    db.session.commit()
-    return jsonify(feature_request.to_dict())
-
-
 @bp.route('/feature-requests', methods=['GET'])
 def get_feature_request():
     feature_id = request.args.get('feature_id', None, type=int)
@@ -185,6 +170,21 @@ def get_feature_request():
                     'api.get_feature_request',
                     client_id=client_id)
             return jsonify(data)
+
+
+@bp.route('/feature-requests', methods=['POST'])
+def feature_requests():
+    data = request.get_json()
+    feature_request = FeatureRequest()
+    feature_request.feature_id = data['feature_id']
+    feature_request.client_id = data['client_id']
+    feature_request.priority = data['priority']
+    time_arr = data['target_date'].split("-")
+    feature_request.target_date = datetime(
+        int(time_arr[0]), int(time_arr[1]), int(time_arr[2]))
+    db.session.add(feature_request)
+    db.session.commit()
+    return jsonify(feature_request.to_dict())
 
 
 @bp.route('/feature-requests', methods=['PUT'])

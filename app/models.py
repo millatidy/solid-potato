@@ -31,7 +31,7 @@ class SearchableMixin(object):
             if isinstance(obj, SearchableMixin):
                 add_to_index(obj.__tablename__, obj)
         for obj in session._changes['update']:
-            if isinstance(obj.__tablename__, obj):
+            if isinstance(obj.__tablename__, SearchableMixin):
                 add_to_index(obj.__tablename__, obj)
         for obj in session._changes['delete']:
             if isinstance(obj, SearchableMixin):
@@ -164,7 +164,7 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
 
 
 class FeatureRequest(PaginatedAPIMixin, db.Model):
-
+    
     feature_id = db.Column(
         db.Integer,
         db.ForeignKey('feature.id'),

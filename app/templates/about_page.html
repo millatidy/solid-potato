@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block content %}
+<div id="about">
+	<h1 class="display-4">Hello!</h1>
+	<p class="lead">
+		This web application was developed by Milla Mutiwokiziva as part of a Remote Engineering job application 
+		to the Britecore Company.
+	</p>
+	<p class="h2">The Tech</p>
+	<p>
+		As per requirement, this projects backend was developed in python using Flask the web Framework as of
+		choice. The frontend is developed with HTML, CSS(Bootstrap 4), and JS(JQuery for RESTAPI calls, and a bit of rendering and knockout for data handling). This web app is deployed on an AWS EC2 instance, in a docker container behind a gunicorn server which sits behing an Nginx reverse proxy server. Database of choice is PostgreSQL also running on AWS. Errors are logged by a Raven from Sentry and are logged on the sentry website.
+	</p>
+	<p class="h2">The Features</p>
+	<p>
+		Beides what was required by Britecore team the only extra additional feature at this point is the ability to search Features in the application. One basic requrement of a web app that has not been implemented is the security aspect all due to time contraints and the fear of missing the submission deadline. This whole app is meant to demonstrate my capability and potential. However this web app is still in active develpment until the BriteCore Team has checked it out.
+	</p>
+	<p class="lead">
+		Thank you for your time. If you have any issues please feel free to log them <a href="https://github.com/millatidy/solid-potato/issues">here</a>.
+	</p>
+</div>
+
+<script type="text/javascript">
+	$('#')
+</script>
+
+{% endblock %}

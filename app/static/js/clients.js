@@ -13,7 +13,7 @@ $(document).ready(function() {
                         name: data.items[i].name,
                         noRequests: data.items[i].no_requests,
                         uri: data.items[i].links.self,
-                        url: ko.observable("/client/" + data.items[i].id)
+                        url: ko.observable("/clients/" + data.items[i].id)
 
                     });
                 }

@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 
 <div id="feature-detail">
-    <h3 data-bind="text: title"></h3>
+    <h1 data-bind="text: title" class="display-4"></h1>
     <p data-bind="text: description"></p>
 
     <div id="newRequestButton">
@@ -49,7 +49,7 @@
                 <form>
                     <label for="inputClient">Client</label>
                     <select data-bind="value: clientID" type="text" id="inputClient" class="form-control">
-                          <option selected>Choose Client</option>
+                          <option value="default">Choose Client</option>
                           <!-- ko foreach: clients -->
                           <option data-bind="text: name, value: id"></option>
                           <!-- /ko -->
@@ -57,7 +57,7 @@
 
                     <label for="inputPriority">Priority</label>
                     <select data-bind="value: priority" type="text" id="inputPriority" class="form-control">
-                          <option selected>Set Priority</option>
+                          <option value="default">Set Priority</option>
                           <option>1</option>
                           <option>2</option>
                           <option>3</option>

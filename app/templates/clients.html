@@ -3,21 +3,22 @@
 {% block content %}
 
 <div id="clients">
+    <h1 class="display-4">Clients</h1>
 	<table id="clients-table" class="table table-hover">
           <thead>
             <tr>
+                <td><b>Client Name</b></td>
                 <td><b>No: Requests</b></td>
-                <td><b>Client</b></td>
                 <td><b>Options</b></td>
             </tr>
           </thead>
             <tbody>
             	<!-- ko foreach: clients -->
             <tr>
+                <td><p><b data-bind="text: name"></b></p></td>
                 <td>
                     <span data-bind="text: noRequests"></span>
                 </td>
-                <td><p><b data-bind="text: name"></b></p></td>
                 <td>
                   <a data-bind="attr: { href: url, title: name }" class="btn btn-primary btn" role="button">View</a>
                 </td>

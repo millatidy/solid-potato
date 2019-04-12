@@ -26,7 +26,11 @@ $(document).ready(function() {
         }
 
         self.add = function(featureRequest) {
-            ApiGateway(self.requestsURI(), 'POST', featureRequest).done(function(data) {
+            var i = self.requests().findIndex(
+                request => request.clientID() === featureRequest.client_id
+            );
+            if(i === -1) {
+                ApiGateway(self.requestsURI(), 'POST', featureRequest).done(function(data) {
                 self.requests.push({
                     featureID: ko.observable(data.feature_id),
                     clientID: ko.observable(data.client_id),
@@ -35,6 +39,10 @@ $(document).ready(function() {
                     clientName: ko.observable(data.client_name)
                 });
             });
+            } else {
+                self.edit(self.requests()[i], featureRequest);
+            }
+            
         }
 
         self.beginEdit = function(featureRequest) {
@@ -134,11 +142,13 @@ $(document).ready(function() {
                 priority: self.priority(),
                 target_date: self.targetDate()
             });
-            self.featureID("");
-            self.clientID("");
-            self.priority("");
-            self.targetDate("");
-            console.log("cleaned up");
+            self.featureID(null);
+            self.clientID(null);
+            self.priority(null);
+            self.targetDate(null);
+
+            $('#inputClient').val('default');
+            $('#inputPriority').val('default');
         }
     }
 

@@ -36,7 +36,7 @@ $(document).ready(function() {
                         productAreaURI: ko.observable(data.links.product_area),
                         requestsURI: ko.observable(data.links.requests),
                         noRequests: ko.observable(data.no_requests),
-                        url: ko.observable("/feature/" + data.id)
+                        url: ko.observable("/features/" + data.id)
                     });
                     if (self.features().length >= self.maxItems()) {
                         self.features.splice(-1, 1);
@@ -99,7 +99,7 @@ $(document).ready(function() {
                     productAreaURI: ko.observable(data.items[i].links.product_area),
                     requestsURI: ko.observable(data.items[i].links.requests),
                     noRequests: ko.observable(data.items[i].no_requests),
-                    url: ko.observable("/feature/" + data.items[i].id)
+                    url: ko.observable("/features/" + data.items[i].id)
                 });
             }
             var page = data._meta.page;
