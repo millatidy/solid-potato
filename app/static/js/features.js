@@ -158,9 +158,10 @@ $(document).ready(function() {
                 description: self.description(),
                 product_area_id: self.productArea()
             });
-            self.title("");
-            self.description("");
-            self.productArea("")
+            self.title(null);
+            self.description(null);
+            self.productArea(null);
+            $("#inputProductArea").val('default').selectpicker("refresh");
         }
 
         self.setProductAreas = function(productAreas) {
