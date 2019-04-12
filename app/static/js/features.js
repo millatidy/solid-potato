@@ -184,7 +184,6 @@ $(document).ready(function() {
 			}
 
 			self.editFeature = function() {
-				console.log("SAFDD");
 					$('#editRequest').modal('hide');
 					featuresViewModel.edit(self.feature, {
 							title: self.title(),
@@ -215,5 +214,4 @@ $(document).ready(function() {
 	ko.applyBindings(featuresViewModel, $('#main')[0]);
 	ko.applyBindings(addFeatureModel, $('#add')[0]);
 	ko.applyBindings(editFeatureViewModel, $('#edit')[0]);
-
 });

@@ -29,15 +29,19 @@
 	        <a class="nav-link" href="/client">Clients</a>
 	      </li>
 	    </ul>
-	    <form class="form-inline my-2 my-lg-0">
-	      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-	      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search Feat</button>
-	    </form>
+	    <div id="search">
+		    <form id="search-form" class="form-inline my-2 my-lg-0">
+			      <input data-bind="value: query" id="search-box" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+			      <button data-bind="click: beginSearch" class="btn btn-outline-success my-2 my-sm-0">Search</button>
+		    </form>
+		</div>
 	  </div>
 	</nav>
 </div>
 
 {% block content %}{% endblock %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
 
 </body>
 </html>
