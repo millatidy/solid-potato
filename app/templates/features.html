@@ -16,8 +16,9 @@
         <table id="features" class="table table-hover">
           <thead>
             <tr>
-                <td><b>No: Requests</b></td>
                 <td><b>Feature</b></td>
+                <td><b>Product Area<b></td>
+                <td><b>No: Requests</b></td>
                 <td><b>Options</b></td>
             </tr>
           </thead>
@@ -26,9 +27,14 @@
             <tbody>
             <tr>
                 <td>
-                    <span data-bind="text: noRequests">noRequests</span>
+                    <span><b data-bind="text: title"></b><span>
                 </td>
-                <td><p><b data-bind="text: title"></b></p></td>
+                <td>
+                    <span><b data-bind="text: productArea"></b><span>
+                </td>
+                <td>
+                    <span data-bind="text: noRequests"></span>
+                </td>
                 <td>
                   <a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a>
                     <button data-bind="click: $parent.beginEdit" type="button"  class="btn btn-primary">Edit</button>

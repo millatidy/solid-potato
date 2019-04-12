@@ -117,6 +117,7 @@ class Client(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
 class ProductArea(PaginatedAPIMixin, DAO_UNIQUE_NAME, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
+    features = db.relationship('Feature', cascade='all, delete, delete-orphan', lazy='dynamic', backref='product_area')
 
     def to_dict(self):
         data = {
@@ -155,6 +156,7 @@ class Feature(SearchableMixin, PaginatedAPIMixin, DAO, db.Model):
             'description': self.description,
             'product_area_id': self.product_area_id,
             'no_requests': self.requests.count(),
+            'product_area': self.product_area.name,
             'links': {
                 'self': url_for('api.feature', id=self.id),
                 'product_area':url_for('api.product_area', id=self.product_area_id),

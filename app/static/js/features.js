@@ -32,7 +32,7 @@ $(document).ready(function() {
 								title: ko.observable(data.title),
 								description: ko.observable(data.description),
 								uri: ko.observable(data.links.self),
-								product_area_id: ko.observable(data.product_area_id),
+								productArea: ko.observable(data.product_area),
 								productAreaURI: ko.observable(data.links.product_area),
 								requestsURI: ko.observable(data.links.requests),
 								noRequests: ko.observable(data.no_requests),
@@ -62,6 +62,7 @@ $(document).ready(function() {
 					// self.features()[i].uri
 					self.features()[i].title(newFeature.title);
 					self.features()[i].description(newFeature.description);
+					self.features()[i].productArea(newFeature.product_area);
 					self.features()[i].product_area_id(newFeature.product_area_id)
 			};
 
@@ -94,6 +95,7 @@ $(document).ready(function() {
 									description: ko.observable(data.items[i].description),
 									uri: ko.observable(data.items[i].links.self),
 									product_area_id: ko.observable(data.items[i].product_area_id),
+									productArea: ko.observable(data.items[i].product_area),
 									productAreaURI: ko.observable(data.items[i].links.product_area),
 									requestsURI: ko.observable(data.items[i].links.requests),
 									noRequests: ko.observable(data.items[i].no_requests),

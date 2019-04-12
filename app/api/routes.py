@@ -5,6 +5,18 @@ from app.models import *
 from app.messages import *
 from app.api import bp
 
+@bp.route('/search')
+def search():
+    per_page = min(request.args.get('per_page', 10, type=int), 100)
+    page = request.args.get('page', 1, type=int)
+    query = request.args.get('q')
+    features_query, total = Feature.search(query, page, 10)
+    features = Feature.to_collection_dict(features_query, page, per_page, 'api.features')
+    # print(features)
+    # print(total)
+    return jsonify(features)
+
+
 @bp.route('/clients', methods=['GET', 'POST'])
 def clients():
     if request.method == 'GET':
