@@ -11,7 +11,7 @@ $(document).ready(function() {
 
     function SearchResultsViewModel() {
         var self = this;
-        self.searchURI = 'http://localhost:6000/api/search?q=';
+        self.searchURI = 'http://localhost:5001/api/search?q=';
         self.results = ko.observableArray();
         self.query = ko.observable(location.href.split('=')[1])
 

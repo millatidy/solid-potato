@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     function FeaturesViewModel() {
         var self = this;
-        self.api = "http://localhost:6000"
+        self.api = "http://localhost:5001"
         self.featuresURI = self.api + "/api/features";
         self.productAreasURI = self.api + "/api/product-areas";
         self.features = ko.observableArray();

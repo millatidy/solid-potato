@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     function FeatureDetailsViewModel() {
         var self = this;
-        self.api = "http://localhost:6000/api"
+        self.api = "http://localhost:5001/api"
         self.clientsURI = self.api + "/clients";
 
         self.id = ko.observable(location.pathname.split("/")[2]);
@@ -42,7 +42,7 @@ $(document).ready(function() {
             } else {
                 self.edit(self.requests()[i], featureRequest);
             }
-            
+
         }
 
         self.beginEdit = function(featureRequest) {

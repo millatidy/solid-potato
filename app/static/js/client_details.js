@@ -6,7 +6,7 @@ $(document).ready(function() {
         self.name = ko.observable();
         self.requests = ko.observableArray();
 
-        self.api = "http://localhost:6000/api";
+        self.api = "http://localhost:5001/api";
         self.clientURI = self.api + "/clients/" + self.id();
         self.featureRequestsURI = self.api + "/feature-requests" + "?client_id=" + self.id();
 
