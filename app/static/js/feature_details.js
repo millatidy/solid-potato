@@ -1,13 +1,17 @@
 $(document).ready(function() {
 
+  /**
+   * FeatureDetailsViewModel is responsible for fetching a Feature's
+   * details and a paginated list of Feature Requests of the Feature
+   * from the api, and handles changes on the Features Details page
+   */
     function FeatureDetailsViewModel() {
         var self = this;
-        self.api = "http://localhost:5001/api"
-        self.clientsURI = self.api + "/clients";
+        self.clientsURI = "/api/clients";
 
         self.id = ko.observable(location.pathname.split("/")[2]);
-        self.requestURI = self.api + "/features/" + self.id();
-        self.featureRequestsURI = self.api + "/feature-requests" + "?feature_id=" + self.id();
+        self.requestURI = "/api/features/" + self.id();
+        self.featureRequestsURI = "/api/feature-requests" + "?feature_id=" + self.id();
 
         self.title = ko.observable();
         self.description = ko.observable();
@@ -25,6 +29,10 @@ $(document).ready(function() {
             $('#addRequest').modal('show');
         }
 
+        /**
+         * Posts new Feature Request to the API and binds it to the
+         * feature details page on success
+         */
         self.add = function(featureRequest) {
             var i = self.requests().findIndex(
                 request => request.clientID() === featureRequest.client_id
@@ -51,6 +59,12 @@ $(document).ready(function() {
             $('#editRequest').modal('show');
         }
 
+        /**
+         * Edits an existing Feature Request with a call to the API
+         * and binds it to the Feaure Details page on success
+         * @param {featureRequest} featureRequest - The existing featureRequest
+         * @param {featureRequest} data - The edited featureRequest
+         */
         self.edit = function(featureRequest, data) {
             ApiGateway(featureRequest.uri(), 'PUT', data).done(function(res) {
                 self.updateRequest(featureRequest, res);
@@ -62,6 +76,12 @@ $(document).ready(function() {
             self.requests()[i].targetDate(newRequest.target_date)
         };
 
+        /**
+         * Calls the DELETE method on the API to delete an existing
+         * Feature Request and removes it from view on success
+         * @param {featureRequest} featureRequest - The Feature
+         * Request to be deleted
+         */
         self.remove = function(featureRequest) {
             ApiGateway(featureRequest.uri(), 'DELETE').done(function() {
                 self.requests.remove(featureRequest);
@@ -121,6 +141,11 @@ $(document).ready(function() {
 
     }
 
+
+    /**
+     * AddFeatureRequestViewModel is responsible for binding data entered
+     * on the Add New Feature Request Modal.
+     */
     function AddFeatureRequestViewModel() {
         var self = this;
         self.featureID = ko.observable();
@@ -152,6 +177,11 @@ $(document).ready(function() {
         }
     }
 
+    /**
+     * EditFeatureRequestViewModel initializes the Edit Feature Request
+     * Modal with data of a Feature Request to be edited and returns
+     * the edited data to the FeatureDetailsViewModel
+     */
     function EditFeatureRequestViewModel() {
         var self = this;
         self.featureID = ko.observable();

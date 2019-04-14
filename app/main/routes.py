@@ -1,6 +1,10 @@
 from flask import render_template
 from app.main import bp
 
+"""
+    This module contains endpoints that return HTML pages
+    for given urls
+"""
 
 @bp.route('/')
 @bp.route('/features')

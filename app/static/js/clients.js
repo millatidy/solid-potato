@@ -1,8 +1,12 @@
 $(document).ready(function() {
-
+  /**
+   * ClientsViewModel is responsible for fetching a paginated list of
+   * Clients from the api and handles changes on the
+   * Client Details page
+   */
     function ClientsViewModel() {
         var self = this;
-        self.clientsURI = "http://localhost:5001/api/clients";
+        self.clientsURI = "/api/clients";
         self.clients = ko.observableArray();
 
         self.getClients = function() {

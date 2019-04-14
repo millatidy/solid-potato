@@ -1,10 +1,14 @@
 $(document).ready(function() {
 
+  /**
+   * FeaturesViewModel is responsible for fetching a paginated list of
+   * Features from the api and handles changes on the
+   * Features page
+   */
     function FeaturesViewModel() {
         var self = this;
-        self.api = "http://localhost:5001"
-        self.featuresURI = self.api + "/api/features";
-        self.productAreasURI = self.api + "/api/product-areas";
+        self.featuresURI = "/api/features";
+        self.productAreasURI = "/api/product-areas";
         self.features = ko.observableArray();
         self.productAreas = ko.observableArray();
         self.clients = ko.observableArray();
@@ -24,6 +28,11 @@ $(document).ready(function() {
             $('#add').modal('show');
         }
 
+        /**
+         * Posts new Feature to the API and binds it to the
+         * features view on success
+         * @param {feature} feature - The new Feature
+         */
         self.add = function(feature) {
             ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
                 if (self.currentPage() == 1) {
@@ -46,11 +55,18 @@ $(document).ready(function() {
             });
         }
 
+
         self.beginEdit = function(feature) {
             editFeatureViewModel.setFeature(feature);
             $('#edit').modal('show');
         }
 
+        /**
+         * Edits an existing Feature with a call to the API and binds it to the
+         * features view on success
+         * @param {feature} feature - The existing feature
+         * @param {feature} data - The edited Feature
+         */
         self.edit = function(feature, data) {
             ApiGateway(feature.uri(), 'PUT', data).done(function(res) {
                 self.updateFeature(feature, res);
@@ -66,12 +82,18 @@ $(document).ready(function() {
             self.features()[i].product_area_id(newFeature.product_area_id)
         };
 
+        /**
+         * Calls the DELETE method on the API to delete an existing Feature
+         * and removes it from view on success
+         * @param {feature} feature - The feature to be deleted
+         */
         self.remove = function(feature) {
             ApiGateway(feature.uri(), 'DELETE').done(function() {
                 self.features.remove(feature);
             });
         }
 
+        // loads the previous Features Page
         self.loadPrev = function() {
             ApiGateway(self.prevFeaturesURI(), 'GET').done(
                 function(data) {
@@ -79,6 +101,7 @@ $(document).ready(function() {
                 });
         }
 
+        // loads the next Features Page
         self.loadNext = function() {
             ApiGateway(self.nextFeaturesURI(), 'GET').done(
                 function(data) {
@@ -144,6 +167,14 @@ $(document).ready(function() {
         self.getProducts();
     }
 
+
+    /**
+     * AddFeatureViewModel is responsible for binding data entered
+     * on the Add New Feature Modal.
+     *
+     * Also initializes Product Area to the Modal user to select as they entered
+     * a new Feature data
+     */
     function AddFeatureViewModel() {
         var self = this;
         self.title = ko.observable();
@@ -170,6 +201,12 @@ $(document).ready(function() {
         }
     }
 
+
+    /**
+     * EditFeatureViewModel initializes the Edit Feature Modal with data of a
+     * Feature to be edited and returns the edited data to the
+     * FeaturesViewModel
+     */
     function EditFeatureViewModel() {
         var self = this;
         self.title = ko.observable();
@@ -191,20 +228,6 @@ $(document).ready(function() {
                 description: self.description(),
                 product_area_id: self.product_area_id()
             });
-        }
-
-    }
-
-    function PaginateViewModel() {
-        var self = this;
-        self.min = ko.observable();
-        self.max = ko.observable();
-        self.totalItems = ko.observable();
-
-        self.init = function(paginate, totalItems) {
-            self.min(paginate[0]);
-            self.max(paginate[1]);
-            self.totalItems(totalItems);
         }
 
     }

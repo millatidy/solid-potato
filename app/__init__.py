@@ -1,7 +1,7 @@
 from flask import Flask , current_app
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate 
+from flask_migrate import Migrate
 from flask_cors import CORS
 from elasticsearch import Elasticsearch
 from raven.contrib.flask import Sentry
@@ -19,7 +19,7 @@ def create_app(config_class=Config):
 	migrate.init_app(app, db)
 	cors.init_app(app, resources={r"/*": {
 									"origins": [
-										"http://0.0.0.0:5000"
+										"http://0.0.0.0:5001"
 										]
 									}
 								})
@@ -27,20 +27,16 @@ def create_app(config_class=Config):
 	from app.main import bp as main_bp
 	app.register_blueprint(main_bp)
 
-	# from app.errors import bp as msg_bp
-	# app.register_blueprint(msg_bp)
-	
+	from app.errors import bp as err_bp
+	app.register_blueprint(err_bp)
 
 	from app.api import bp as api_bp
 	app.register_blueprint(api_bp, url_prefix="/api")
 
-
 	app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
 	if app.config['ELASTICSEARCH_URL'] else None
 
-
 	if not app.debug:
-		# Sentry
 		sentry.init_app(app, dsn='https://f70b58dfecda4089b51567122c36a881:4fcb5bf1b52f4ddc974db998dc3f1fd2@sentry.io/1292364')
 
 	return app

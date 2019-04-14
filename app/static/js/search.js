@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     /*
-     * This view Model is responsiple for capturing seach queries and
+     * This view Model is responsible for capturing search queries and
      * redirectig the browser to search resuls page
      *
      */

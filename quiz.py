@@ -1,16 +1,14 @@
 from cryptography.fernet import Fernet
 
-Key = 'TluxwB3fV_GWuLkR1_BzGs1Zk90TYAuhNMZP_0q4WyM='
+key = 'TluxwB3fV_GWuLkR1_BzGs1Zk90TYAuhNMZP_0q4WyM='
 
 # Oh no! The code is going over the edge! What are you going to do?
-# F12 and click element inspector
-# Copy and paste from source
-message = b'gAAAAABcl4kVUw8WLI-LJo1J2zs-DyLIIpL9_owX5E11LmOHPEgRDRJYRjFeqLgNXRCgfELU5IGtnlq0TPH44cV3z2_1Yp7EVwwsBnlcY1pM0SQ3ndhmFHLMGA9C_mmW_jdt-09slpxo_VRpkm0sSWDo4x9dtAjqthFwmx6gzcAQ_eaHA5F98MWi9lzKncPastpvqUGkiEhA'
+message = b'gAAAAABcsgNm20qut_EdSVGME-ZqCn3Im_VO3BTWYGjRDaXY38XlMawznNovFHxpPF3fjLWe7iaUXvpxuR7usrE_u5yVkxAtuS9txlNOnGNmuKhSXSwywAbpN4Eu1Uu4VRhX5_5nGCpMoD0FoSlLlhjBrL03Qrb7b3O7exwoA6v5KXWye0mwvcZWcdqGVJKjcwoBh0chJ6ga'
 
 def main():
-    f = Fernet(Key)
+    f = Fernet(key)
     print(f.decrypt(message))
 
 
-if __name__ == "__main__":
+if __name__== "__main__":
     main()
