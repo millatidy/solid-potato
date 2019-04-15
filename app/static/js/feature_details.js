@@ -43,7 +43,7 @@ $(document).ready(function() {
                     featureID: ko.observable(data.feature_id),
                     clientID: ko.observable(data.client_id),
                     priority: ko.observable(data.priority),
-                    targetDate: ko.observable(data.target_date),
+                    targetDate: ko.observable(dateConverter(data.target_date)),
                     clientName: ko.observable(data.client_name)
                 });
             });
@@ -73,7 +73,7 @@ $(document).ready(function() {
         self.updateRequest = function(featureRequest, newRequest) {
             var i = self.requests.indexOf(featureRequest);
             self.requests()[i].priority(newRequest.priority);
-            self.requests()[i].targetDate(newRequest.target_date)
+            self.requests()[i].targetDate(dateConverter(newRequest.target_date))
         };
 
         /**
@@ -121,12 +121,14 @@ $(document).ready(function() {
                             featureID: ko.observable(data.items[i].feature_id),
                             clientID: ko.observable(data.items[i].client_id),
                             priority: ko.observable(data.items[i].priority),
-                            targetDate: ko.observable(data.items[i].target_date),
+                            targetDate: ko.observable(dateConverter(data.items[i].target_date)),
                             uri: ko.observable(data.items[i].links.self),
                             clientName: ko.observable(data.items[i].client_name)
                         });
                     }
-
+                    // console.log(data.items[0].target_date);
+                    // momentString = dateConverter(data.items[0].target_date)
+                    // console.log(momentString);
                 });
         }
 
@@ -153,6 +155,7 @@ $(document).ready(function() {
         self.priority = ko.observable();
         self.targetDate = ko.observable();
         self.clients = ko.observableArray();
+        self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
         self.initialize = function(featureID, clients) {
             self.featureID(featureID());
@@ -167,6 +170,7 @@ $(document).ready(function() {
                 priority: self.priority(),
                 target_date: self.targetDate()
             });
+            console.log(self.targetDate());
             self.featureID(null);
             self.clientID(null);
             self.priority(null);
@@ -189,6 +193,7 @@ $(document).ready(function() {
         self.priority = ko.observable();
         self.targetDate = ko.observable();
         self.clients = ko.observableArray();
+        self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
         self.initialize = function(featureID, clients) {
             self.featureID(featureID());

@@ -33,3 +33,11 @@ function Paginate(page, perPage, itemsLength) {
 
     return [itemsRangeMin, itemsRangeMax];
 }
+
+function dateConverter(date) {
+  var dateString = date;
+  var dateObj = new Date(dateString);
+  var momentObj = moment(dateObj);
+  var momentString = momentObj.format('YYYY-MM-DD');
+  return momentString;
+}

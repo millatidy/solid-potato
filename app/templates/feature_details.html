@@ -66,7 +66,7 @@
                         </select>
 
                     <label for="inputTargetDate">Target Date</label>
-                    <input data-bind="value: targetDate" type="text" id="inputTargetDate" placeholder="YYYY-MM-DD" class="form-control">
+                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }"  type="date" id="inputTargetDate" placeholder="dd/mm/yyyy" class="form-control">
 
                 </form>
             </div>
@@ -100,7 +100,7 @@
                         </select>
 
                     <label for="editTargetDate">New Target Date</label>
-                    <input data-bind="value: targetDate" type="text" id="editTargetDate" placeholder="YYYY-MM-DD" class="form-control">
+                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="editTargetDate" placeholder="dd/mm/yyyy" class="form-control">
 
                 </form>
             </div>
