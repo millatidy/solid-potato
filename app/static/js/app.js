@@ -6,7 +6,7 @@
  * @param {object} data - The data to be sent to the server
  */
 function ApiGateway(uri, method, data) {
-    const host = 'https://workshift.co.zw/britecore';
+    const host = 'http://britecore.workshift.co.zw';
     // const host = "http://localhost:5000";
     var request = {
         url: host + uri,
