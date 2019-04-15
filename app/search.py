@@ -3,7 +3,7 @@ from flask import current_app
 
 def add_to_index(index, model):
     if not current_app.elasticsearch:
-        return
+        return [], 0
     payload = {}
     for field in model.__searchable__:
         payload[field] = getattr(model, field)
@@ -13,7 +13,7 @@ def add_to_index(index, model):
 
 def remove_from_index(index, model):
     if not current_app.elasticsearch:
-        return
+        return [], 0
     current_app.elasticsearch.delete(index=index, doc_type=index, id=model.id)
 
 

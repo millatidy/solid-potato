@@ -7,7 +7,7 @@
  */
 function ApiGateway(uri, method, data) {
     // const host = 'https://workshift.co.zw/britecore';
-    const host = "http://localhost:5001";
+    const host = "http://localhost:5000";
     var request = {
         url: host + uri,
         type: method,

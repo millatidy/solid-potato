@@ -6,127 +6,239 @@ basedir = os.getcwd()
 cov = coverage(branch=True, omit=['.git/*', 'venv/*', 'tests.py', 'requirements.txt'])
 cov.start()
 
-
-from app import app, db
+from flask import current_app, json
+from app import create_app, db
+from datetime import datetime
 from app.models import *
+from app.api.routes import *
+from config import Config
 
-class DAOCase(unittest.TestCase):
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    ELASTICSEARCH_URL = None
+
+class ClientCase(unittest.TestCase):
 
     def setUp(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        self.app = app.test_client()
+        # self.app = create_app(TestConfig)
+        # self.app_context = self.app.app_context()
+        # self.app_context.push()
         db.create_all()
 
-        self.client = Client()
-        self.client.name = "Client A"
-        self.client.save()
+class ErrorsCase(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app(TestConfig)
+        self.test_client = self.app.test_client()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.request_context = self.app.test_request_context()
+        self.request_context.push()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
 
-    def test_create(self):
-        client = Client()
-        client.name = "Client B"
-        client.save()
-        self.assertEqual(self.client.id, 1)
-        self.assertEqual(client.id, 2)
 
-    def test_find_all(self):
-        client = Client()
-        clients = client.find_all()
-        self.assertEqual(len(clients), 1)
 
-    def test_find_one(self):
-        client = Client()
-        client = client.find_one(1)
-        self.assertEqual(client.name, "Client A")
-
-    def test_find_one_404(self):
-        client = Client()
-        client = client.find_one(2)
-        self.assertEqual(client, None)
-
-    def test_unique(self):
-        client = Client()
-        client.name = "Client A"
-        client.save()
-        self.assertNotEqual(client.name, self.client.name)
-        self.assertEqual(client.name, "Client A_1")
-
-    def test_update(self):
-        client = Client.query.get(1)
-        client.name = "Client X"
-        client.update()
-        self.assertEqual(client.name, "Client X")
-        self.assertNotEqual(client.name, "Client A")
-
-    def test_delete(self):
-        client = Client.query.get(1)
-        client.delete()
-        clients = len(db.session.query(Client).all())
-        self.assertNotEqual(clients, 1)
-        self.assertEqual(clients, 0)
-
-class PriorityCase(unittest.TestCase):
+class APICase(unittest.TestCase):
 
     def setUp(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        self.app = app.test_client()
+        self.app = create_app(TestConfig)
+        self.test_client = self.app.test_client()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.request_context = self.app.test_request_context()
+        self.request_context.push()
         db.create_all()
-
-        client_A = Client()
-        client_A.name = "Client A"
-        client_A.save()
-
-        productArea = ProductArea()
-        productArea.title = "Policies"
-        productArea.save()
-
-        feature_X = Feature()
-        feature_X.title = "The next big thing"
-        feature_X.description = "Lorem ipsum dolor sit amet"
-        feature_X.product_area_id = productArea.id
-        feature_X.save()
-
-        feature_request = FeatureRequest()
-        feature_request.feature_id = feature_X.id
-        feature_request.client_id = client_A.id
-        feature_request.priority = 4
-        feature_request.save()
-
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
-    '''
-        Business requirement:
-        - Priority numbers should not repeat for the given client
-    '''
-    def test_priority_numbering(self):
-        feature_request = FeatureRequest().query.get((1,1))
-        feature_request.priority = 3
-        feature_request.update()
-        self.assertNotEqual(feature_request.priority, 4)
-        self.assertEqual(feature_request.priority, 3)
+    # def test_search(self):
+    #     res = search().get("?q=milla")
+    #     print(res)
 
-    def test_client_requests(self):
-        client1 = Client.query.get(1)
-        client2 = Client()
-        client2.name = "Client 2"
-        client2.save()
+    def test_get_clients(self):
+        res = clients()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 0)
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        res = clients()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 1)
 
-        requests1 = client1.requests.count()
-        requests2 = client2.requests.count()
-        self.assertEqual(requests1, 1)
-        self.assertEqual(requests2, 0)
+    def test_post_client(self):
+        res = self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Client A")
 
-    def test_feature_requests(self):
-        feature_request = FeatureRequest().query.get((1,1))
-        feature_title = feature_request.feature.title
-        self.assertNotEqual(feature_title, "The next big thin")
-        self.assertEqual(feature_title, "The next big thing")
+    def test_get_client(self):
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        res = self.test_client.get('/api/clients/1')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Client A")
+
+    def test_edit_client(self):
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        res = self.test_client.put('/api/clients/1', data=json.dumps(dict(name="Client B")), content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Client B")
+
+    def test_delete_client(self):
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        res = self.test_client.delete('/api/clients/1')
+        self.assertEqual(res.status_code, 200)
+
+    def test_get_product_areas(self):
+        res = product_areas()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 0)
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        res = product_areas()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 1)
+
+    def test_post_product_area(self):
+        res = self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Billing")
+
+    def test_get_product_area(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        res = self.test_client.get('/api/product-areas/1')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Billing")
+
+    def test_edit_product_area(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        res = self.test_client.put('/api/product-areas/1', data=json.dumps(dict(name="Policies")), content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['name'], "Policies")
+
+    def test_delete_product_area(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        res = self.test_client.delete('/api/product-areas/1')
+        self.assertEqual(res.status_code, 200)
+
+    def test_get_features(self):
+        res = features()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 0)
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        res = features()
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(len(data['items']), 1)
+
+    def test_get_feature(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        res = self.test_client.get('/api/features/1')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['title'], "Feature_1")
+
+    def test_edit_feature(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        res = self.test_client.put('/api/features/1', data=json.dumps(dict(title="Feature 2", description="The Feature", product_area_id=1)), content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(data['title'], "Feature 2")
+
+    def test_delete_feature(self):
+        self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        res = self.test_client.delete('/api/features/1')
+        self.assertEqual(res.status_code, 200)
+
+    def test_get_feature_request_no_id(self):
+        res = get_feature_request()
+        self.assertEqual(res.status_code, 200)
+
+    def test_get_feature_request_feature_id(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            res = self.test_client.get('/api/features-requests?feature_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['code'], 404)
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.get('/api/feature-requests?feature_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(len(data['items']), 1)
+
+    def test_get_feature_request_client_id(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            res = self.test_client.get('/api/features-requests?feature_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['code'], 404)
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.get('/api/feature-requests?client_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(len(data['items']), 1)
+
+    def test_get_feature_request_all_ids(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            res = self.test_client.get('/api/features-requests?feature_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['code'], 404)
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.get('/api/feature-requests?feature_id=1&client_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['priority'], 1)
+
+    def test_edit_feature_request(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            c.put('/api/feature-requests?feature_id=1&client_id=1', data=json.dumps(dict(client_id=1, feature_id=1, priority=3, target_date="2019-05-01")), content_type='application/json')
+            res = c.get('/api/feature-requests?feature_id=1&client_id=1')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['priority'], 3)
+
+    def test_edit_feature_request_no_ids(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.put('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=3, target_date="2019-05-01")), content_type='application/json')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['message'], 'feature_id and client_id cannot be empty')
+
+    def test_edit_feature_request_no_one_id(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.put('/api/feature-requests?client_id=1', data=json.dumps(dict(client_id=1, feature_id=1, priority=3, target_date="2019-05-01")), content_type='application/json')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['message'], 'both feature_id and client_id are required')
+            res = c.put('/api/feature-requests?feature_id=1', data=json.dumps(dict(client_id=1, feature_id=1, priority=3, target_date="2019-05-01")), content_type='application/json')
+            data = json.loads(res.get_data(as_text=True))
+            self.assertEqual(data['message'], 'both feature_id and client_id are required')
+
+    def test_delete_feature_request(self):
+        with self.app.test_client() as c:
+            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
+            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
+            res = c.delete('/api/feature-requests?feature_id=1&client_id=1')
+            self.assertEqual(res.status_code, 200)
 
 if __name__ == '__main__':
     try:

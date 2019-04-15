@@ -131,12 +131,6 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
         lazy='dynamic',
         backref='feature')
 
-    def save(self):
-        if not self.is_unique():
-            self.title += "_1"
-        db.session.add(self)
-        db.session.commit()
-
     def is_unique(self):
         if self.query.filter_by(title=self.title).count() > 0:
             return False
@@ -164,7 +158,7 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
 
 
 class FeatureRequest(PaginatedAPIMixin, db.Model):
-    
+
     feature_id = db.Column(
         db.Integer,
         db.ForeignKey('feature.id'),

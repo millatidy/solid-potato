@@ -18,21 +18,21 @@ def error_resposnse(status_code, message=None):
 @bp.app_errorhandler(400)
 def bad_request(ex):
     if request.path.startswith('/api/'):
-        return jsonify({"error": "Bad request.", "code":"400"})
+        return jsonify({"error": "Bad request.", "code": 400})
     else:
         return ex
 
 @bp.app_errorhandler(404)
 def not_found(ex):
     if request.path.startswith('/api/'):
-        return jsonify({"error": "Resources not found.", "code":"404"})
+        return jsonify({"error": "Resources not found.", "code": 404})
     else:
         return ex
 
 @bp.app_errorhandler(405)
 def method_not_allowed(ex):
     if request.path.startswith('/api/'):
-        return jsonify({"error": "Method not allowed.", "code":"405"})
+        return jsonify({"error": "Method not allowed.", "code": 405})
     else:
         return ex
 
@@ -40,7 +40,7 @@ def method_not_allowed(ex):
 @bp.app_errorhandler(410)
 def gone(ex):
     if request.path.startswith('/api/'):
-        return jsonify({"error": "Resource is gone.", "code":"410"})
+        return jsonify({"error": "Resource is gone.", "code": 410})
     else:
         return ex
 
@@ -49,6 +49,6 @@ def gone(ex):
 def internal_server_error(ex):
     db.session.rollback()
     if request.path.startswith('/api/'):
-        return jsonify({"error": "Internal server error.", "code":"500"})
+        return jsonify({"error": "Internal server error.", "code": 500})
     else:
         return ex

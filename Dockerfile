@@ -11,7 +11,7 @@ RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev libressl-dev l
 # Create app directory
 WORKDIR /app
 
-COPY requirements.txt . 
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 RUN pip install gunicorn
@@ -24,6 +24,4 @@ RUN chmod +x boot.sh
 
 ENV FLASK_APP solid_potato.py
 
-EXPOSE 6000
 ENTRYPOINT ["./boot.sh"]
-
