@@ -10,7 +10,6 @@ cd solid-potato
 pip install requirements.txt
 
 export FLASK_APP=solid_potato.py
-export FLASK_RUN_PORT=5001
 
 if you want to run in debugging mode
 
