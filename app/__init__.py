@@ -33,8 +33,7 @@ def create_app(config_class=Config):
 	from app.api import bp as api_bp
 	app.register_blueprint(api_bp, url_prefix="/api")
 
-	app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
-	if app.config['ELASTICSEARCH_URL'] else None
+	app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) if app.config['ELASTICSEARCH_URL'] else None
 
 	if not app.debug:
 		sentry.init_app(app, dsn='https://f70b58dfecda4089b51567122c36a881:4fcb5bf1b52f4ddc974db998dc3f1fd2@sentry.io/1292364')

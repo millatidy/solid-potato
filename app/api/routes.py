@@ -131,7 +131,7 @@ def get_feature_request(page, per_page):
     feature_id = request.args.get('feature_id', None, type=int)
     client_id = request.args.get('client_id', None, type=int)
 
-    args = (int(feature_id != None), int(client_id != None))
+    args = (int(feature_id is not None), int(client_id is not None))
 
     # both feature_id and client_id are None
     if args == (0, 0):
@@ -164,7 +164,6 @@ def get_feature_request(page, per_page):
     if args == (1, 1):
         feature_request = FeatureRequest().query.get_or_404((feature_id, client_id))
         return jsonify(feature_request.to_dict())
-
 
 
 @bp.route('/feature-requests', methods=['POST'])

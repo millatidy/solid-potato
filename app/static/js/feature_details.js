@@ -1,10 +1,10 @@
 $(document).ready(function() {
 
-  /**
-   * FeatureDetailsViewModel is responsible for fetching a Feature's
-   * details and a paginated list of Feature Requests of the Feature
-   * from the api, and handles changes on the Features Details page
-   */
+    /**
+     * FeatureDetailsViewModel is responsible for fetching a Feature's
+     * details and a paginated list of Feature Requests of the Feature
+     * from the api, and handles changes on the Features Details page
+     */
     function FeatureDetailsViewModel() {
         var self = this;
         self.clientsURI = "/api/clients";
@@ -37,16 +37,16 @@ $(document).ready(function() {
             var i = self.requests().findIndex(
                 request => request.clientID() === featureRequest.client_id
             );
-            if(i === -1) {
+            if (i === -1) {
                 ApiGateway(self.requestsURI(), 'POST', featureRequest).done(function(data) {
-                self.requests.push({
-                    featureID: ko.observable(data.feature_id),
-                    clientID: ko.observable(data.client_id),
-                    priority: ko.observable(data.priority),
-                    targetDate: ko.observable(dateConverter(data.target_date)),
-                    clientName: ko.observable(data.client_name)
+                    self.requests.push({
+                        featureID: ko.observable(data.feature_id),
+                        clientID: ko.observable(data.client_id),
+                        priority: ko.observable(data.priority),
+                        targetDate: ko.observable(dateConverter(data.target_date)),
+                        clientName: ko.observable(data.client_name)
+                    });
                 });
-            });
             } else {
                 self.edit(self.requests()[i], featureRequest);
             }
@@ -170,7 +170,6 @@ $(document).ready(function() {
                 priority: self.priority(),
                 target_date: self.targetDate()
             });
-            console.log(self.targetDate());
             self.featureID(null);
             self.clientID(null);
             self.priority(null);

@@ -1,10 +1,10 @@
 $(document).ready(function() {
 
-  /**
-   * FeaturesViewModel is responsible for fetching a paginated list of
-   * Features from the api and handles changes on the
-   * Features page
-   */
+    /**
+     * FeaturesViewModel is responsible for fetching a paginated list of
+     * Features from the api and handles changes on the
+     * Features page
+     */
     function FeaturesViewModel() {
         var self = this;
         self.featuresURI = "/api/features";
@@ -22,6 +22,7 @@ $(document).ready(function() {
 
         self.nextFeaturesURI = ko.observable();
         self.prevFeaturesURI = ko.observable();
+        self.currentPageURI = ko.observableArray();
 
         self.beginAdd = function() {
             addFeatureModel.setProductAreas(self.productAreas)
@@ -90,6 +91,7 @@ $(document).ready(function() {
         self.remove = function(feature) {
             ApiGateway(feature.uri(), 'DELETE').done(function() {
                 self.features.remove(feature);
+                self.reload(); // the delete hack in action
             });
         }
 
@@ -130,18 +132,28 @@ $(document).ready(function() {
             self.totalItems(data._meta.total_items)
             self.maxItems(per_page);
             self.currentPage(page);
+            self.currentPageURI(data._links.self); // this is for delete hack
 
             var paginate = Paginate(data._meta.page, data._meta.per_page, data.items.length);
 
             self.min(paginate[0]);
             self.max(paginate[1]);
 
-            self.nextFeaturesURI(self.api + data._links.next);
-            self.prevFeaturesURI(self.api + data._links.prev);
+            self.nextFeaturesURI(data._links.next);
+            self.prevFeaturesURI(data._links.prev);
         }
 
         self.getFeatures = function() {
             ApiGateway(self.featuresURI, 'GET').done(
+                function(data) {
+                    self.loadFeaures(data);
+                });
+        }
+
+        // reload features after delete
+        // not the most efficient but it pulls the trick
+        self.reload = function() {
+            ApiGateway(self.currentPageURI(), 'GET').done(
                 function(data) {
                     self.loadFeaures(data);
                 });
@@ -192,7 +204,7 @@ $(document).ready(function() {
             self.title(null);
             self.description(null);
             self.productArea(null);
-            $("#inputProductArea").val('default').selectpicker("refresh");
+            $("#inputProductArea").val('default');
         }
 
         self.setProductAreas = function(productAreas) {

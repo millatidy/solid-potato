@@ -11,7 +11,7 @@
     </div>
     <br>
 
-    <table id="features" class="table table-hover">
+    <table id="features" class="table table-borderless table-hover table-sm">
         <thead>
             <tr>
                 <td><b>Feature</b></td>
@@ -25,18 +25,20 @@
         <tbody>
             <tr>
                 <td>
-                    <span><b data-bind="text: title"></b><span>
+                    <span data-bind="text: title"><span>
                 </td>
                 <td>
-                    <span><b data-bind="text: productArea"></b><span>
+                    <span data-bind="text: productArea"><span>
                 </td>
                 <td>
                     <span data-bind="text: noRequests"></span>
                 </td>
                 <td>
-                    <a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a>
-                    <button data-bind="click: $parent.beginEdit" type="button" class="btn btn-primary">Edit</button>
-                    <button data-bind="click: $parent.remove" type="button" class="btn btn-primary">Delete</button>
+                    <div class="btn-group" role="group">
+                        <a data-bind="attr: { href: url, title: description }" class="btn btn-primary btn" role="button">View</a>
+                        <button data-bind="click: $parent.beginEdit" type="button" class="btn btn-primary">Edit</button>
+                        <button data-bind="click: $parent.remove" type="button" class="btn btn-primary">Delete</button>
+                    </div>
                 </td>
             </tr>
         </tbody>
@@ -63,7 +65,7 @@
                     <input data-bind="value: title" type="text" id="inputTitle" placeholder="Feature Title" class="form-control">
 
                     <label for="inputDescription">Description</label>
-                    <input data-bind="value: description" type="text" id="inputDescription" placeholder="Description" class="form-control">
+                    <textarea data-bind="value: description" id="inputDescription" placeholder="Description" rows="3" class="form-control"></textarea>
 
                     <label for="inputProductArea">Product Area</label>
                     <select data-bind="value: productArea" type="text" id="inputProductArea" class="form-control">
@@ -98,7 +100,7 @@
                     <input data-bind="value: title" type="text" id="editTitle" placeholder="Feature Title" class="form-control">
 
                     <label for="editDescription">Description</label>
-                    <input data-bind="value: description" type="text" id="editDescription" placeholder="Description" class="form-control">
+                    <textarea data-bind="value: description" rows="3" id="editDescription" placeholder="Description" class="form-control"></textarea>
 
                 </form>
             </div>

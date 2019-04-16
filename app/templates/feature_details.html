@@ -2,14 +2,14 @@
 
 <div id="feature-detail">
     <h1 data-bind="text: title" class="display-4"></h1>
-    <p data-bind="text: description"></p>
+    <p class="lead" data-bind="text: description"></p>
 
     <div id="newRequestButton">
         <button data-bind="click: beginAdd" data-toggle="modal" class="btn btn-primary">New Request</button>
     </div>
     <br>
 
-    <table id="feature-requests" class="table table-hover">
+    <table id="feature-requests" class="table table-borderless table-hover table-sm">
         <thead>
             <tr>
                 <td><b>Client Name</b></td>
@@ -25,8 +25,10 @@
                 <td data-bind="text: priority"></td>
                 <td data-bind="text: targetDate"></td>
                 <td>
-                    <button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
-                    <button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
+                    <div class="btn-group" role="group">
+                        <button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
+                        <button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
+                    </div>
                 </td>
             </tr>
             <!-- /ko -->
@@ -66,7 +68,7 @@
                         </select>
 
                     <label for="inputTargetDate">Target Date</label>
-                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }"  type="date" id="inputTargetDate" placeholder="dd/mm/yyyy" class="form-control">
+                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="inputTargetDate" placeholder="dd/mm/yyyy" class="form-control">
 
                 </form>
             </div>

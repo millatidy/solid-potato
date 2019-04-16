@@ -1,10 +1,10 @@
 $(document).ready(function() {
 
-  /**
-   * ClientDetailsViewModel is responsible for fetching a Clients details
-   * from the api and a list of paginated Feature Requests of that client, and
-   * handles changes on the Client Details page
-   */
+    /**
+     * ClientDetailsViewModel is responsible for fetching a Clients details
+     * from the api and a list of paginated Feature Requests of that client, and
+     * handles changes on the Client Details page
+     */
     function ClientDetailsViewModel() {
         var self = this;
         self.id = ko.observable(location.pathname.split("/")[2]);

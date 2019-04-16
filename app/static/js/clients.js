@@ -1,9 +1,9 @@
 $(document).ready(function() {
-  /**
-   * ClientsViewModel is responsible for fetching a paginated list of
-   * Clients from the api and handles changes on the
-   * Client Details page
-   */
+    /**
+     * ClientsViewModel is responsible for fetching a paginated list of
+     * Clients from the api and handles changes on the
+     * Client Details page
+     */
     function ClientsViewModel() {
         var self = this;
         self.clientsURI = "/api/clients";

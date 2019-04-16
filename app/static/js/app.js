@@ -6,8 +6,8 @@
  * @param {object} data - The data to be sent to the server
  */
 function ApiGateway(uri, method, data) {
-    const host = 'http://britecore.workshift.co.zw';
-    // const host = "http://localhost:5000";
+    // const host = 'http://britecore.workshift.co.zw';
+    const host = "http://localhost:5000";
     var request = {
         url: host + uri,
         type: method,
@@ -27,17 +27,22 @@ function ApiGateway(uri, method, data) {
 }
 
 function Paginate(page, perPage, itemsLength) {
+    var itemsRangeMin = 0;
+    var itemsRangeMax = 0;
 
-    var itemsRangeMin = (page - 1) * perPage + 1;
-    var itemsRangeMax = (page - 1) * perPage + itemsLength;
+    if (itemsLength >= 1) {
+        itemsRangeMin = (page - 1) * perPage + 1;
+    }
+
+    itemsRangeMax = (page - 1) * perPage + itemsLength;
 
     return [itemsRangeMin, itemsRangeMax];
 }
 
 function dateConverter(date) {
-  var dateString = date;
-  var dateObj = new Date(dateString);
-  var momentObj = moment(dateObj);
-  var momentString = momentObj.format('YYYY-MM-DD');
-  return momentString;
+    var dateString = date;
+    var dateObj = new Date(dateString);
+    var momentObj = moment(dateObj);
+    var momentString = momentObj.format('YYYY-MM-DD');
+    return momentString;
 }
