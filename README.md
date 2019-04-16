@@ -2,24 +2,24 @@
 BriteCore Feature Request App
 
 ### How to download and run
-git clone https://github.com/millatidy/solid-potato.git
-cd solid-potato
-pip install requirements.txt
-export FLASK_APP=solid_potato.py
-if you want to run in debugging mode
-export FLASK_DEBUG=1
+git clone https://github.com/millatidy/solid-potato.git<br>
+cd solid-potato<br>
+pip install requirements.txt<br>
+export FLASK_APP=solid_potato.py<br>
+if you want to run in debugging mode<br>
+export FLASK_DEBUG=1<br>
 
 ### Migrate database
-flask db init
-flask db migrate
-flask db upgrade
+flask db init<br>
+flask db migrate<br>
+flask db upgrade<br>
 flask run
 
 # Deployment
-Web Framework: Flask
-WSGI: Gunicorn
-Server: Nginx
-Container: Docker
-Ocherstration: Docker Compose
-Platform: AWS EC2 t2.mirco
+Web Framework: Flask<br>
+WSGI: Gunicorn<br>
+Server: Nginx<br>
+Container: Docker<br>
+Ocherstration: Docker Compose<br>
+Platform: AWS EC2 t2.mirco<br>
 Link: http://britecore.workshift.co.zw
