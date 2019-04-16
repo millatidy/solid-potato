@@ -23,3 +23,12 @@ flask db migrate
 flask db upgrade
 
 flask run
+
+# Deployment
+Web Framework: Flask
+WSGI: Gunicorn
+Server: Nginx
+Container: Docker
+Ocherstration: Docker Compose
+Platform: AWS EC2 t2.mirco
+Link: http://britecore.workshift.co.zw
