@@ -6,8 +6,8 @@
 	</p>
 	<p class="h2">The Tech</p>
 	<p>
-		As per requirements, this project's backend is developed in python using Flask as the web Framework as of choice. The frontend is developed with HTML, CSS(Bootstrap 4), and JS(JQuery for RESTAPI calls, and a bit of rendering and Knockout.js for data handling).
-		This web app is deployed on an AWS EC2 t2.mirco instance therefore Elasticsearch is disabled due to memory limitations. The web app sits in a docker container behind a gunicorn server which sits behind an Nginx reverse proxy server. Database of choice
+		As per requirements, this project's backend is developed in python using Flask as the web Framework of choice. The frontend is developed with HTML, CSS(Bootstrap 4), and JS(JQuery for RESTAPI calls, and a bit of rendering and Knockout.js for data handling).
+		This web app is deployed on an AWS EC2 t2.mirco instance, running Unbuntu 18.04, therefore Elasticsearch is disabled due to memory limitations. The web app sits in a docker container behind a Gunicorn WSGI Server which sits behind an Nginx reverse proxy server. Database of choice
 		is PostgreSQL also running on AWS. Errors are logged by a Raven from Sentry and are logged on the sentry website.
 	</p>
 	<p class="h2">The Features</p>
