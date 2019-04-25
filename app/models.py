@@ -133,9 +133,9 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
         db.DateTime(),
         default=datetime.utcnow() + timedelta(days=90))
     client_priority = db.relationship(
-    'ClientPriority',
-    cascade='all, delete, delete-orphan',
-    backref='feature', uselist=False)
+        'ClientPriority',
+        cascade='all, delete, delete-orphan',
+        backref='feature', uselist=False)
 
     def to_dict(self):
         data = {
