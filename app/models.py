@@ -74,7 +74,7 @@ class Client(PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
     requests = db.relationship(
-        'FeatureRequest',
+        'Feature',
         cascade='all, delete, delete-orphan',
         lazy='dynamic',
         backref='client')
@@ -89,7 +89,7 @@ class Client(PaginatedAPIMixin, db.Model):
                     'api.client',
                     id=self.id),
                 'requests': url_for(
-                    'api.get_feature_request',
+                    'api.features',
                     client_id=self.id)}}
         return data
 
@@ -121,29 +121,33 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
+    client_id = db.Column(
+        db.Integer,
+        db.ForeignKey('client.id')
+    )
     product_area_id = db.Column(
         db.Integer,
         db.ForeignKey('product_area.id'),
         nullable=False)
-    requests = db.relationship(
-        'FeatureRequest',
-        cascade='all, delete, delete-orphan',
-        lazy='dynamic',
-        backref='feature')
-
-    def is_unique(self):
-        if self.query.filter_by(title=self.title).count() > 0:
-            return False
-        return True
+    target_date = db.Column(
+        db.DateTime(),
+        default=datetime.utcnow() + timedelta(days=90))
+    client_priority = db.relationship(
+    'ClientPriority',
+    cascade='all, delete, delete-orphan',
+    backref='feature', uselist=False)
 
     def to_dict(self):
         data = {
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'product_area_id': self.product_area_id,
-            'no_requests': self.requests.count(),
-            'product_area': self.product_area.name,
+            'productAreaID': self.product_area_id,
+            'productArea': self.product_area.name,
+            'client': self.client.name,
+            'clientID': self.client_id,
+            'clientPriority': self.client_priority.priority,
+            'targetDate': self.target_date,
             'links': {
                 'self': url_for(
                     'api.feature',
@@ -151,49 +155,33 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
                 'product_area': url_for(
                     'api.product_area',
                     id=self.product_area_id),
-                'requests': url_for(
-                    'api.get_feature_request',
-                    feature_id=self.id)}}
-        return data
-
-
-class FeatureRequest(PaginatedAPIMixin, db.Model):
-
-    feature_id = db.Column(
-        db.Integer,
-        db.ForeignKey('feature.id'),
-        primary_key=True)
-    client_id = db.Column(
-        db.Integer,
-        db.ForeignKey('client.id'),
-        primary_key=True)
-    priority = db.Column(db.Integer)
-    target_date = db.Column(
-        db.DateTime(),
-        default=datetime.utcnow() +
-        timedelta(
-            days=90))
-
-    def to_dict(self):
-        data = {
-            'feature_id': self.feature_id,
-            'client_id': self.client_id,
-            'priority': self.priority,
-            'target_date': self.target_date,
-            'feature_title': self.feature.title,
-            'client_name': self.client.name,
-            'links': {
-                'self': url_for(
-                    'api.get_feature_request',
-                    feature_id=self.feature_id,
-                    client_id=self.client_id),
-                'feature': url_for(
-                    'api.feature',
-                    id=self.feature_id),
                 'client': url_for(
                     'api.client',
                     id=self.client_id)}}
         return data
+
+    def convert_date(self, string_date):
+        date_arr = string_date.split("-")
+        py_date = datetime(int(date_arr[0]), int(date_arr[1]), int(date_arr[2]))
+        return py_date
+
+    def from_dict(self, data):
+        data['target_date'] = self.convert_date(data['target_date'])
+        cli_pr = ClientPriority()
+        cli_pr.client_id = data['client_id']
+        cli_pr.priority = data['client_priority']
+        for field in ['title', 'description', 'client_id', 'product_area_id', 'target_date']:
+            setattr(self, field, data[field])
+
+        setattr(self, "client_priority", cli_pr)
+
+        return self
+
+class ClientPriority(db.Model):
+
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+    priority = db.Column(db.Integer, primary_key=True)
+    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'))
 
 
 db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)

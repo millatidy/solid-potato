@@ -1,5 +1,9 @@
 $(document).ready(function() {
 
+  function validate() {
+    $('#inputTitle').prop('requred', true);
+  }
+
     /**
      * FeaturesViewModel is responsible for fetching a paginated list of
      * Features from the api and handles changes on the
@@ -9,6 +13,7 @@ $(document).ready(function() {
         var self = this;
         self.featuresURI = "/api/features";
         self.productAreasURI = "/api/product-areas";
+        self.clientsURI = "/api/clients";
         self.features = ko.observableArray();
         self.productAreas = ko.observableArray();
         self.clients = ko.observableArray();
@@ -25,7 +30,7 @@ $(document).ready(function() {
         self.currentPageURI = ko.observableArray();
 
         self.beginAdd = function() {
-            addFeatureModel.setProductAreas(self.productAreas)
+            addFeatureModel.init(self.productAreas, self.clients);
             $('#add').modal('show');
         }
 
@@ -42,10 +47,12 @@ $(document).ready(function() {
                         title: ko.observable(data.title),
                         description: ko.observable(data.description),
                         uri: ko.observable(data.links.self),
-                        productArea: ko.observable(data.product_area),
-                        productAreaURI: ko.observable(data.links.product_area),
-                        requestsURI: ko.observable(data.links.requests),
-                        noRequests: ko.observable(data.no_requests),
+                        productAreaID: ko.observable(data.productAreaID),
+                        productArea: ko.observable(data.productArea),
+                        client: ko.observable(data.client),
+                        clientID: ko.observable(data.clientID),
+                        clientPriority: ko.observable(data.clientPriority),
+                        targetDate: ko.observable(dateConverter(data.targetDate)),
                         url: ko.observable("/features/" + data.id)
                     });
                     if (self.features().length >= self.maxItems()) {
@@ -58,7 +65,7 @@ $(document).ready(function() {
 
 
         self.beginEdit = function(feature) {
-            editFeatureViewModel.setFeature(feature);
+            editFeatureViewModel.init(feature, self.productAreas, self.clients);
             $('#edit').modal('show');
         }
 
@@ -76,11 +83,12 @@ $(document).ready(function() {
 
         self.updateFeature = function(feature, newFeature) {
             var i = self.features.indexOf(feature);
-            // self.features()[i].uri
             self.features()[i].title(newFeature.title);
             self.features()[i].description(newFeature.description);
-            self.features()[i].productArea(newFeature.product_area);
-            self.features()[i].product_area_id(newFeature.product_area_id)
+            self.features()[i].productArea(newFeature.productArea);
+            self.features()[i].productAreaID(newFeature.productAreaID);
+            self.features()[i].targetDate(newFeature.targetDate);
+            self.features()[i].clientID(newFeature.clientID)
         };
 
         /**
@@ -119,11 +127,12 @@ $(document).ready(function() {
                     title: ko.observable(data.items[i].title),
                     description: ko.observable(data.items[i].description),
                     uri: ko.observable(data.items[i].links.self),
-                    product_area_id: ko.observable(data.items[i].product_area_id),
-                    productArea: ko.observable(data.items[i].product_area),
-                    productAreaURI: ko.observable(data.items[i].links.product_area),
-                    requestsURI: ko.observable(data.items[i].links.requests),
-                    noRequests: ko.observable(data.items[i].no_requests),
+                    productAreaID: ko.observable(data.items[i].productAreaID),
+                    productArea: ko.observable(data.items[i].productArea),
+                    client: ko.observable(data.items[i].client),
+                    clientID: ko.observable(data.items[i].clientID),
+                    clientPriority: ko.observable(data.items[i].clientPriority),
+                    targetDate: ko.observable(dateConverter(data.items[i].targetDate)),
                     url: ko.observable("/features/" + data.items[i].id)
                 });
             }
@@ -172,11 +181,28 @@ $(document).ready(function() {
                 });
         }
 
+        self.getClients = function() {
+            ApiGateway(self.clientsURI, 'GET').done(
+                function(data) {
+                    for (var i = 0; i < data.items.length; i++) {
+                        self.clients.push({
+                            id: ko.observable(data.items[i].id),
+                            name: ko.observable(data.items[i].name),
+                            uri: ko.observable(data.items[i].links.self),
+                            requstsURI: ko.observable(data.items[i].links.requests)
+                        });
+                    }
+                });
+        }
+
         // Get Features
         self.getFeatures();
 
         // Get Products
         self.getProducts();
+
+        // Load Clients
+        self.getClients();
     }
 
 
@@ -189,26 +215,38 @@ $(document).ready(function() {
      */
     function AddFeatureViewModel() {
         var self = this;
-        self.title = ko.observable();
+        self.title = ko.observable().extend({ required: true });
         self.description = ko.observable();
-        self.productArea = ko.observable();
+        self.productAreaID = ko.observable();
         self.productAreas = ko.observableArray();
+        self.clients = ko.observableArray();
+        self.clientID = ko.observable();
+        self.targetDate = ko.observable();
+        self.clientPriority = ko.observable();
+        self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
         self.addFeature = function() {
             $('#add').modal('hide');
             featuresViewModel.add({
                 title: self.title(),
                 description: self.description(),
-                product_area_id: self.productArea()
+                product_area_id: self.productAreaID(),
+                client_id: self.clientID(),
+                target_date: self.targetDate(),
+                client_priority: self.clientPriority()
             });
             self.title(null);
             self.description(null);
-            self.productArea(null);
+            self.productAreaID(null);
+            self.targetDate(null);
+            self.clientID(null);
+            self.clientPriority(null);
             $("#inputProductArea").val('default');
         }
 
-        self.setProductAreas = function(productAreas) {
+        self.init = function(productAreas, clients) {
             self.productAreas(productAreas());
+            self.clients(clients());
             $('#add').modal('show');
         }
     }
@@ -223,22 +261,37 @@ $(document).ready(function() {
         var self = this;
         self.title = ko.observable();
         self.description = ko.observable();
-        self.product_area_id = ko.observable();
+        self.productAreaID = ko.observable();
+        self.productAreas = ko.observableArray();
+        self.clients = ko.observableArray();
+        self.clientID = ko.observable();
+        self.targetDate = ko.observable();
+        self.clientPriority = ko.observable();
+        self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
-        self.setFeature = function(feature) {
+        self.init = function(feature, productAreas, clients) {
             self.feature = feature;
             self.title(feature.title());
             self.description(feature.description());
-            self.product_area_id(feature.product_area_id());
-            $('#edit').modal('show');
+            self.productAreaID(feature.productAreaID());
+            self.clientID(feature.clientID());
+            self.targetDate(feature.targetDate());
+            self.clientPriority(feature.clientPriority());
+            self.productAreas(productAreas());
+            self.clients(clients());
+            console.log(self.clientID());
+            console.log(self.productAreaID());
         }
 
         self.editFeature = function() {
-            $('#editRequest').modal('hide');
+            $('#edit').modal('hide');
             featuresViewModel.edit(self.feature, {
                 title: self.title(),
                 description: self.description(),
-                product_area_id: self.product_area_id()
+                product_area_id: self.productAreaID(),
+                client_id: self.clientID(),
+                target_date: self.targetDate(),
+                client_priority: self.clientPriority()
             });
         }
 

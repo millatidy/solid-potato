@@ -21,6 +21,6 @@ WSGI: Gunicorn<br>
 Server: Nginx<br>
 Container: Docker<br>
 Ocherstration: Docker Compose<br>
-OS: Ubuntu 18.04<br>
+OS: Ubuntu 18.04 LTS<br>
 Platform: AWS EC2 t2.mirco<br>
 Link: http://britecore.workshift.co.zw

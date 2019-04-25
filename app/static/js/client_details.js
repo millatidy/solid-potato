@@ -12,7 +12,7 @@ $(document).ready(function() {
         self.requests = ko.observableArray();
 
         self.clientURI = "/api/clients/" + self.id();
-        self.featureRequestsURI = "/api/feature-requests" + "?client_id=" + self.id();
+        self.featureRequestsURI = "/api/features" + "?client_id=" + self.id();
 
         // Dummy function for editing a Feature Request
         self.beginEdit = function() {
@@ -34,11 +34,11 @@ $(document).ready(function() {
             ApiGateway(self.featureRequestsURI, 'GET').done(function(data) {
                 for (var i = 0; i < data.items.length; i++) {
                     self.requests.push({
-                        featureID: ko.observable(data.items[i].feature_id),
+                        id: ko.observable(data.items[i].id),
                         clientID: ko.observable(data.items[i].client_id),
-                        featureTitle: ko.observable(data.items[i].feature_title),
-                        priority: ko.observable(data.items[i].priority),
-                        targetDate: ko.observable(data.items[i].target_date),
+                        featureTitle: ko.observable(data.items[i].title),
+                        clientPriority: ko.observable(data.items[i].clientPriority),
+                        targetDate: ko.observable(dateConverter(data.items[i].targetDate)),
                         uri: ko.observable(data.items[i].links.self)
                     });
                 }
