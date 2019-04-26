@@ -160,26 +160,51 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
                     id=self.client_id)}}
         return data
 
+    # needs modification unique contraint violation
+    def validate(self):
+        priority = ClientPriority.query.filter_by(
+            priority=self.client_priority.priority,
+            client_id=self.client_id).first()
+        if priority:
+            print(self.id)
+            print(priority.feature_id)
+            if self.id == priority.feature_id:
+                return True
+            return False
+        return True
+
     def convert_date(self, string_date):
         date_arr = string_date.split("-")
-        py_date = datetime(int(date_arr[0]), int(date_arr[1]), int(date_arr[2]))
+        py_date = datetime(int(date_arr[0]), int(
+            date_arr[1]), int(date_arr[2]))
         return py_date
 
     def from_dict(self, data):
-        data['target_date'] = self.convert_date(data['target_date'])
+        data['target_date'] = self.convert_date(
+            data['target_date']) if 'date' in data else None
         cli_pr = ClientPriority()
         cli_pr.client_id = data['client_id']
         cli_pr.priority = data['client_priority']
-        for field in ['title', 'description', 'client_id', 'product_area_id', 'target_date']:
-            setattr(self, field, data[field])
+        for field in [
+            'title',
+            'description',
+            'client_id',
+            'product_area_id',
+                'target_date']:
+            if field in data:
+                setattr(self, field, data[field])
 
         setattr(self, "client_priority", cli_pr)
 
         return self
 
+
 class ClientPriority(db.Model):
 
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+    client_id = db.Column(
+        db.Integer,
+        db.ForeignKey('client.id'),
+        primary_key=True)
     priority = db.Column(db.Integer, primary_key=True)
     feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'))
 

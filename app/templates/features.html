@@ -12,26 +12,30 @@
     <br>
 
     <table id="features" class="table table-borderless table-sm">
-      <!-- ko foreach: features -->
+        <!-- ko foreach: features -->
         <tbody>
             <tr>
-              <td>
-                  <h3 data-bind="text: title" class="display-4"></h3>
-                  <p data-bind="text: description" class="lead"><p>
-                  <div>
-                    <ul class="list-group list-group-horizontal">
-                      <li data-bind="text: client" class="list-group-item"></li>
-                      <li data-bind="text: productArea" class="list-group-item"><li>
-                      <li data-bind="text: clientPriority" class="list-group-item"><li>
-                      <li data-bind="text: targetDate" class="list-group-item"><li>
-                    </ul>
-                  <div>
-                  <br>
-                  <div class="btn-group float-right" role="group">
-                      <button data-bind="click: $parent.beginEdit" type="button" class="btn btn-primary">Edit</button>
-                      <button data-bind="click: $parent.remove" type="button" class="btn btn-primary">Delete</button>
-                  </div>
-              </td>
+                <td>
+                    <h3 data-bind="text: title" class="display-4"></h3>
+                    <p data-bind="text: description" class="lead">
+                        <p>
+                            <div>
+                                <ul class="list-group list-group-horizontal">
+                                    <li data-bind="text: client" class="list-group-item"></li>
+                                    <li data-bind="text: productArea" class="list-group-item">
+                                        <li>
+                                            <li data-bind="text: clientPriority" class="list-group-item">
+                                                <li>
+                                                    <li data-bind="text: targetDate" class="list-group-item">
+                                                        <li>
+                                </ul>
+                                <div>
+                                    <br>
+                                    <div class="btn-group float-right" role="group">
+                                        <button data-bind="click: $parent.beginEdit" type="button" class="btn btn-primary">Edit</button>
+                                        <button data-bind="click: $parent.remove" type="button" class="btn btn-primary">Delete</button>
+                                    </div>
+                </td>
             </tr>
         </tbody>
 
@@ -39,107 +43,113 @@
 
     </table>
 
-</div>
+    </div>
 
 
-<div id="add" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="addDialogLabel" class="modal-title">New Feature</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <div id="add" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDialogLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="addDialogLabel" class="modal-title">New Feature</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <label for="inputTitle">Feature Title</label>
-                    <input data-bind="value: title" type="text" id="inputTitle" placeholder="Feature Title" class="form-control" required>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="inputTitle">Feature Title *</label>
+                        <input data-bind="value: title" type="text" id="inputTitle" placeholder="Feature Title" class="form-control" required>
 
-                    <label for="inputDescription">Description</label>
-                    <textarea data-bind="value: description" id="inputDescription" placeholder="Description" rows="3" class="form-control"></textarea>
+                        <label for="inputDescription">Description</label>
+                        <textarea data-bind="value: description" id="inputDescription" placeholder="Description" rows="3" class="form-control"></textarea>
 
-                    <label for="inputClient">Client</label>
-                    <select data-bind="value: clientID" type="text" id="inputClient" class="form-control">
+                        <label for="inputClient">Client *</label>
+                        <select data-bind="value: clientID" type="text" id="inputClient" class="form-control">
                           <option value="default">Choose client</option>
                           <!-- ko foreach: clients -->
                           <option data-bind="text: name, value: id"></option>
                           <!-- /ko -->
                     </select>
 
-                    <label for="inputClientPriority">Client Priority</label>
-                    <input data-bind="value: clientPriority" type="number" id="inputClientPriority" placeholder="1...n" class="form-control" required>
+                        <label for="inputClientPriority">Client Priority *</label>
+                        <input data-bind="value: clientPriority" type="number" id="inputClientPriority" placeholder="1...n" class="form-control" required>
+                        <div id="priority-exits" style="display:none;color:red;">Ooops Priority number already exits for selected client</div>
 
-                    <label for="inputTargetDate">Target Date</label>
-                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="inputTargetDate" placeholder="dd/mm/yyyy" class="form-control">
+                        <label for="inputTargetDate">Target Date</label>
+                        <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="inputTargetDate" placeholder="dd/mm/yyyy" class="form-control">
 
-                    <label for="inputProductArea">Product Area</label>
-                    <select data-bind="value: productAreaID" type="text" id="inputProductArea" class="form-control">
+                        <label for="inputProductArea">Product Area *</label>
+                        <select data-bind="value: productAreaID" type="text" id="inputProductArea" class="form-control">
                           <option value="default">Choose Product Area</option>
                           <!-- ko foreach: productAreas -->
                           <option data-bind="text: name, value: id"></option>
                           <!-- /ko -->
                     </select>
 
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button data-bind="click: addFeature" class="btn btn-primary">Add Feature</button>
-                <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                        <span id="data-requred" style="display:none;color:red;">Please Fill requred Field(s) in asterix(*)</span>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click: addFeature" class="btn btn-primary">Add Feature</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editDialogLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="editDialogLabel" class="modal-title">Edit Feature</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editDialogLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="editDialogLabel" class="modal-title">Edit Feature</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <label for="editTitle">Feature Title</label>
-                    <input data-bind="value: title" type="text" id="editTitle" placeholder="Feature Title" class="form-control">
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="editTitle">Feature Title *</label>
+                        <input data-bind="value: title" type="text" id="editTitle" placeholder="Feature Title" class="form-control">
 
-                    <label for="editDescription">Description</label>
-                    <textarea data-bind="value: description" rows="3" id="editDescription" placeholder="Description" class="form-control"></textarea>
+                        <label for="editDescription">Description</label>
+                        <textarea data-bind="value: description" rows="3" id="editDescription" placeholder="Description" class="form-control"></textarea>
 
-                    <label for="editClient">Client</label>
-                    <select data-bind="value: clientID" type="text" id="editClient" class="form-control">
+                        <label for="editClient">Client *</label>
+                        <select data-bind="value: clientID" type="text" id="editClient" class="form-control">
                           <!-- <option>Choose client</option> -->
                           <!-- ko foreach: clients -->
                           <option data-bind="text: name, value: id"></option>
                           <!-- /ko -->
                     </select>
 
-                    <label for="editClientPriority">Client Priority</label>
-                    <input data-bind="value: clientPriority" type="number" id="editClientPriority" placeholder="1...n" class="form-control" required>
+                        <label for="editClientPriority">Client Priority *</label>
+                        <input data-bind="value: clientPriority" type="number" id="editClientPriority" placeholder="1...n" class="form-control" required>
+                        <div id="priority-exits" style="display:none;color:red;">Ooops Priority number already exits for selected client</div>
 
-                    <label for="editTargetDate">Target Date</label>
-                    <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="editTargetDate" placeholder="dd/mm/yyyy" class="form-control">
+                        <label for="editTargetDate">Target Date</label>
+                        <input data-bind="{value: targetDate, attr: { min: minimumDate } }" type="date" id="editTargetDate" placeholder="dd/mm/yyyy" class="form-control">
 
-                    <label for="editProductArea">Product Area</label>
-                    <select data-bind="value: productAreaID" type="text" id="editProductArea" class="form-control">
+                        <label for="editProductArea">Product Area *</label>
+                        <select data-bind="value: productAreaID" type="text" id="editProductArea" class="form-control">
                           <!-- <option>Choose Product Area</option> -->
                           <!-- ko foreach: productAreas -->
                           <option data-bind="text: name, value: id"></option>
                           <!-- /ko -->
                     </select>
 
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button data-bind="click: editFeature" class="btn btn-primary">Update</button>
-                <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                        <span id="data-requred" style="display:none;color:red;">Please Fill requred Field(s) in asterix(*)</span>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click: editFeature" class="btn btn-primary">Update</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/features.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/features.js') }}"></script>
 
-{% endblock %}
+    {% endblock %}

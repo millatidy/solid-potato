@@ -1,8 +1,8 @@
 $(document).ready(function() {
 
-  function validate() {
-    $('#inputTitle').prop('requred', true);
-  }
+    function validate() {
+        $('#inputTitle').prop('requred', true);
+    }
 
     /**
      * FeaturesViewModel is responsible for fetching a paginated list of
@@ -41,6 +41,12 @@ $(document).ready(function() {
          */
         self.add = function(feature) {
             ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
+                if (data.error) {
+                    $('#priority-exits').show();
+                    return;
+                }
+                $('#priority-exits').hide();
+                addFeatureModel.destruct();
                 if (self.currentPage() == 1) {
                     self.features.unshift({
                         id: ko.observable(data.id),
@@ -58,6 +64,10 @@ $(document).ready(function() {
                     if (self.features().length >= self.maxItems()) {
                         self.features.splice(-1, 1);
                     }
+                }
+                // increment pagination values
+                if ((self.currentPage() < 2) && (self.max() < self.maxItems())) {
+                    self.max(self.max() + 1);
                 }
                 self.totalItems(self.totalItems() + 1);
             });
@@ -87,7 +97,7 @@ $(document).ready(function() {
             self.features()[i].description(newFeature.description);
             self.features()[i].productArea(newFeature.productArea);
             self.features()[i].productAreaID(newFeature.productAreaID);
-            self.features()[i].targetDate(newFeature.targetDate);
+            self.features()[i].targetDate(dateConverter(newFeature.targetDate));
             self.features()[i].clientID(newFeature.clientID)
         };
 
@@ -215,7 +225,7 @@ $(document).ready(function() {
      */
     function AddFeatureViewModel() {
         var self = this;
-        self.title = ko.observable().extend({ required: true });
+        self.title = ko.observable();
         self.description = ko.observable();
         self.productAreaID = ko.observable();
         self.productAreas = ko.observableArray();
@@ -226,7 +236,11 @@ $(document).ready(function() {
         self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
         self.addFeature = function() {
-            $('#add').modal('hide');
+            if (!self.validate()) {
+                $('#data-requred').show();
+                return;
+            };
+            $('#data-requred').hide();
             featuresViewModel.add({
                 title: self.title(),
                 description: self.description(),
@@ -235,19 +249,31 @@ $(document).ready(function() {
                 target_date: self.targetDate(),
                 client_priority: self.clientPriority()
             });
-            self.title(null);
-            self.description(null);
-            self.productAreaID(null);
-            self.targetDate(null);
-            self.clientID(null);
-            self.clientPriority(null);
-            $("#inputProductArea").val('default');
         }
 
         self.init = function(productAreas, clients) {
             self.productAreas(productAreas());
             self.clients(clients());
             $('#add').modal('show');
+        }
+
+        self.destruct = function() {
+            $('#add').modal('hide');
+            self.title(null);
+            self.description(null);
+            self.productAreaID(null);
+            self.targetDate(null);
+            self.clientID(null);
+            self.clientPriority(null);
+            $("#inputClient").val('default');
+            $("#inputProductArea").val('default');
+        }
+
+        self.validate = function() {
+            if (self.title() && self.clientID() && self.clientPriority() && self.productAreaID()) {
+                return true;
+            }
+            return false;
         }
     }
 
@@ -270,6 +296,8 @@ $(document).ready(function() {
         self.minimumDate = ko.observable(dateConverter(moment(moment(), "YYYY-MM-DD").add(15, 'days')));
 
         self.init = function(feature, productAreas, clients) {
+            $("#inputClient").val(feature.clientID());
+            $("#inputProductArea").val(feature.productAreaID());
             self.feature = feature;
             self.title(feature.title());
             self.description(feature.description());
@@ -279,11 +307,13 @@ $(document).ready(function() {
             self.clientPriority(feature.clientPriority());
             self.productAreas(productAreas());
             self.clients(clients());
-            console.log(self.clientID());
-            console.log(self.productAreaID());
         }
 
         self.editFeature = function() {
+            if (!self.validate()) {
+                $('#data-requred').show();
+                return;
+            };
             $('#edit').modal('hide');
             featuresViewModel.edit(self.feature, {
                 title: self.title(),
@@ -293,6 +323,13 @@ $(document).ready(function() {
                 target_date: self.targetDate(),
                 client_priority: self.clientPriority()
             });
+        }
+
+        self.validate = function() {
+            if (self.title() && self.clientID() && self.clientPriority() && self.productAreaID()) {
+                return true;
+            }
+            return false;
         }
 
     }

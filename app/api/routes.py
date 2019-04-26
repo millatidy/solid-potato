@@ -96,7 +96,13 @@ def features(page, per_page):
         client_id = request.args.get('client_id', None, type=int)
         data = {}
         if client_id:
-            data = Feature.to_collection_dict(Feature.query.join(ClientPriority).filter_by(client_id=client_id).order_by(ClientPriority.priority.asc()), page, per_page, 'api.features')
+            data = Feature.to_collection_dict(
+                Feature.query.join(ClientPriority).filter_by(
+                    client_id=client_id).order_by(
+                    ClientPriority.priority.asc()),
+                page,
+                per_page,
+                'api.features')
         else:
             data = Feature.to_collection_dict(Feature.query.order_by(
                 Feature.id.desc()), page, per_page, 'api.features')
@@ -105,9 +111,12 @@ def features(page, per_page):
         data = request.get_json()
         feature = Feature()
         feature.from_dict(data)
-        db.session.add(feature)
-        db.session.commit()
-        return jsonify(feature.to_dict())
+        if feature.validate():
+            db.session.add(feature)
+            db.session.commit()
+            return jsonify(feature.to_dict())
+        else:
+            return jsonify({'error': 'Priority already exists'})
 
 
 @bp.route('/features/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -117,11 +126,12 @@ def feature(id):
         return jsonify(feature.to_dict())
     elif request.method == 'PUT':
         data = request.get_json()
-        feature.title = data['title']
-        feature.description = data['description']
-        feature.product_area_id = data['product_area_id']
-        db.session.commit()
-        return jsonify(feature.to_dict())
+        feature.from_dict(data)  # needs fixing unique constarain violation
+        if f.validate():
+            db.session.commit()
+            return jsonify(feature.to_dict())
+        else:
+            return jsonify({'error': 'Priority already exists'})
     else:
         db.session.delete(feature)
         db.session.commit()
