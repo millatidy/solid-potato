@@ -72,7 +72,7 @@
                     </select>
 
                         <label for="inputClientPriority">Client Priority *</label>
-                        <input data-bind="value: clientPriority" type="number" id="inputClientPriority" placeholder="1...n" class="form-control" required>
+                        <input data-bind="value: clientPriority" type="number" id="inputClientPriority" placeholder="Positive number, 1 has highest priority" class="form-control" pattern=" 0+\.[0-9]*[1-9][0-9]*$" onkeypress="return event.charCode >= 48 && event.charCode <= 57" min=1>
                         <div id="priority-exits" style="display:none;color:red;">Ooops Priority number already exits for selected client</div>
 
                         <label for="inputTargetDate">Target Date</label>
@@ -124,7 +124,7 @@
                     </select>
 
                         <label for="editClientPriority">Client Priority *</label>
-                        <input data-bind="value: clientPriority" type="number" id="editClientPriority" placeholder="1...n" class="form-control" required>
+                        <input data-bind="value: clientPriority" type="number" id="editClientPriority" placeholder="Positive number, 1 has highest priority" class="form-control" pattern=" 0+\.[0-9]*[1-9][0-9]*$" onkeypress="return event.charCode >= 48 && event.charCode <= 57" min=1>
                         <div id="priority-exits" style="display:none;color:red;">Ooops Priority number already exits for selected client</div>
 
                         <label for="editTargetDate">Target Date</label>

@@ -98,7 +98,9 @@ $(document).ready(function() {
             self.features()[i].productArea(newFeature.productArea);
             self.features()[i].productAreaID(newFeature.productAreaID);
             self.features()[i].targetDate(dateConverter(newFeature.targetDate));
-            self.features()[i].clientID(newFeature.clientID)
+            self.features()[i].client(newFeature.client);
+            self.features()[i].clientID(newFeature.clientID),
+            self.features()[i].clientPriority(newFeature.clientPriority);
         };
 
         /**
