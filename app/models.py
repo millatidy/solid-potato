@@ -166,8 +166,6 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
             priority=self.client_priority.priority,
             client_id=self.client_id).first()
         if priority:
-            print(self.id)
-            print(priority.feature_id)
             if self.id == priority.feature_id:
                 return True
             return False
@@ -177,11 +175,12 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
         date_arr = string_date.split("-")
         py_date = datetime(int(date_arr[0]), int(
             date_arr[1]), int(date_arr[2]))
+        print(py_date)
         return py_date
 
     def from_dict(self, data):
         data['target_date'] = self.convert_date(
-            data['target_date']) if 'date' in data else None
+            data['target_date']) if 'target_date' in data else None
         cli_pr = ClientPriority()
         cli_pr.client_id = data['client_id']
         cli_pr.priority = data['client_priority']
