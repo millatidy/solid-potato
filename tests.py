@@ -129,60 +129,34 @@ class APICase(unittest.TestCase):
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(len(data['items']), 0)
         self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", client_id=1, client_priority=1, description="The Feature", product_area_id=1)), content_type='application/json')
         res = features()
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(len(data['items']), 1)
 
     def test_get_feature(self):
         self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", client_id=1, client_priority=1, description="The Feature", product_area_id=1)), content_type='application/json')
         res = self.test_client.get('/api/features/1')
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(data['title'], "Feature_1")
 
     def test_edit_feature(self):
         self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
-        res = self.test_client.put('/api/features/1', data=json.dumps(dict(title="Feature 2", description="The Feature", product_area_id=1)), content_type='application/json')
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", client_id=1, client_priority=9,description="The Feature", product_area_id=1)), content_type='application/json')
+        res = self.test_client.put('/api/features/1', data=json.dumps(dict(title="Feature 2", client_id=1, client_priority=8, description="The Feature", product_area_id=1)), content_type='application/json')
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(data['title'], "Feature 2")
 
     def test_delete_feature(self):
         self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
+        self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
+        self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", client_id=1, client_priority=8, description="The Feature", product_area_id=1)), content_type='application/json')
         res = self.test_client.delete('/api/features/1')
         self.assertEqual(res.status_code, 200)
-
-    def test_get_feature_request_no_id(self):
-        res = get_feature_request()
-        self.assertEqual(res.status_code, 200)
-
-    def test_get_feature_request_feature_id(self):
-        with self.app.test_client() as c:
-            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
-            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
-            res = self.test_client.get('/api/features-requests?feature_id=1')
-            data = json.loads(res.get_data(as_text=True))
-            self.assertEqual(data['code'], 404)
-            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
-            res = c.get('/api/feature-requests?feature_id=1')
-            data = json.loads(res.get_data(as_text=True))
-            self.assertEqual(len(data['items']), 1)
-
-    def test_get_feature_request_client_id(self):
-        with self.app.test_client() as c:
-            self.test_client.post('/api/clients', data=json.dumps(dict(name="Client A")), content_type='application/json')
-            self.test_client.post('/api/product-areas', data=json.dumps(dict(name="Billing")), content_type='application/json')
-            self.test_client.post('/api/features', data=json.dumps(dict(title="Feature_1", description="The Feature", product_area_id=1)), content_type='application/json')
-            res = self.test_client.get('/api/features-requests?feature_id=1')
-            data = json.loads(res.get_data(as_text=True))
-            self.assertEqual(data['code'], 404)
-            self.test_client.post('/api/feature-requests', data=json.dumps(dict(client_id=1, feature_id=1, priority=1, target_date="2019-05-01")), content_type='application/json')
-            res = c.get('/api/feature-requests?client_id=1')
-            data = json.loads(res.get_data(as_text=True))
-            self.assertEqual(len(data['items']), 1)
 
 if __name__ == '__main__':
     try:

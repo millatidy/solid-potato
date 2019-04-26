@@ -127,7 +127,7 @@ def feature(id):
     elif request.method == 'PUT':
         data = request.get_json()
         feature.from_dict(data)  # needs fixing unique constarain violation
-        if f.validate():
+        if feature.validate():
             db.session.commit()
             return jsonify(feature.to_dict())
         else:
