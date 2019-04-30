@@ -4,6 +4,40 @@ from flask import abort, url_for
 from datetime import datetime, timedelta
 
 
+class SessionManager(object):
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
+        PriorityRulesMixin.before_commit(session)
+
+    @classmethod
+    def after_commit(cls, session):
+        SearchableMixin.after_commit(session)
+        session._changes = None
+
+class PriorityRulesMixin(object):
+
+    @classmethod
+    def before_commit(cls, session):
+        for obj in session._changes['add']:
+            if isinstance(obj, PriorityRulesMixin):
+                if int(obj.client_priority.priority) == 1:
+                    cls.suspend_request_orders(obj.client_id)
+        for obj in session._changes['update']:
+            if isinstance(obj, PriorityRulesMixin):
+                if int(obj.client_priority.priority) == 1:
+                    cls.suspend_request_orders(obj.client_id)
+
+    @classmethod
+    def suspend_request_orders(cls, client_id):
+        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==client_id).update(dict(suspended=True), synchronize_session=False)
+
+
 class SearchableMixin(object):
 
     @classmethod
@@ -17,16 +51,17 @@ class SearchableMixin(object):
         return cls.query.filter(cls.id.in_(ids)).order_by(
             db.case(when, value=cls.id)), total
 
-    @classmethod
-    def before_commit(cls, session):
-        session._changes = {
-            'add': list(session.new),
-            'update': list(session.dirty),
-            'delete': list(session.deleted)
-        }
+    # @classmethod
+    # def before_commit(cls, session):
+    #     session._changes = {
+    #         'add': list(session.new),
+    #         'update': list(session.dirty),
+    #         'delete': list(session.deleted)
+    #     }
 
     @classmethod
     def after_commit(cls, session):
+        print(session._changes)
         for obj in session._changes['add']:
             if isinstance(obj, SearchableMixin):
                 add_to_index(obj.__tablename__, obj)
@@ -36,7 +71,6 @@ class SearchableMixin(object):
         for obj in session._changes['delete']:
             if isinstance(obj, SearchableMixin):
                 remove_from_index(obj.__tablename__, obj)
-        session._changes = None
 
     @classmethod
     def reindex(cls):
@@ -115,12 +149,13 @@ class ProductArea(PaginatedAPIMixin, db.Model):
         return data
 
 
-class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
+class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
 
     __searchable__ = ['title', 'description']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
+    suspended = db.Column(db.Boolean, default=False)
     client_id = db.Column(
         db.Integer,
         db.ForeignKey('client.id')
@@ -148,6 +183,7 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
             'clientID': self.client_id,
             'clientPriority': self.client_priority.priority,
             'targetDate': self.target_date,
+            'suspended': self.suspended,
             'links': {
                 'self': url_for(
                     'api.feature',
@@ -175,7 +211,6 @@ class Feature(SearchableMixin, PaginatedAPIMixin, db.Model):
         date_arr = string_date.split("-")
         py_date = datetime(int(date_arr[0]), int(
             date_arr[1]), int(date_arr[2]))
-        print(py_date)
         return py_date
 
     def from_dict(self, data):
@@ -208,5 +243,5 @@ class ClientPriority(db.Model):
     feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'))
 
 
-db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+db.event.listen(db.session, 'before_commit', SessionManager.before_commit)
+db.event.listen(db.session, 'after_commit', SessionManager.after_commit)

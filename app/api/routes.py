@@ -127,11 +127,11 @@ def feature(id):
     elif request.method == 'PUT':
         data = request.get_json()
         feature.from_dict(data)  # needs fixing unique constarain violation
-        if feature.validate():
-            db.session.commit()
-            return jsonify(feature.to_dict())
-        else:
-            return jsonify({'error': 'Priority already exists'})
+        # if feature.validate():
+        db.session.commit()
+        return jsonify(feature.to_dict())
+        # else:
+        #     return jsonify({'error': 'Priority already exists'})
     else:
         db.session.delete(feature)
         db.session.commit()
