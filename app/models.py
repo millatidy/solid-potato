@@ -31,7 +31,7 @@ class PriorityRulesMixin(object):
         for obj in session._changes['update']:
             if isinstance(obj, PriorityRulesMixin):
                 if int(obj.client_priority.priority) == 1:
-                    cls.suspend_request_orders(obj.client_id)
+                    cls.suspend_request_orders(obj)
 
     @classmethod
     def suspend_request_orders(cls, obj):
