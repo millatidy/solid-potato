@@ -27,15 +27,15 @@ class PriorityRulesMixin(object):
         for obj in session._changes['add']:
             if isinstance(obj, PriorityRulesMixin):
                 if int(obj.client_priority.priority) == 1:
-                    cls.suspend_request_orders(obj.client_id)
+                    cls.suspend_request_orders(obj)
         for obj in session._changes['update']:
             if isinstance(obj, PriorityRulesMixin):
                 if int(obj.client_priority.priority) == 1:
                     cls.suspend_request_orders(obj.client_id)
 
     @classmethod
-    def suspend_request_orders(cls, client_id):
-        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==client_id, Feature.id!=obj.id).update(dict(suspended=True), synchronize_session=False)
+    def suspend_request_orders(cls, obj):
+        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==obj.client_id, Feature.id!=obj.id).update(dict(suspended=True), synchronize_session=False)
         obj.suspended=False
 
 
