@@ -35,7 +35,8 @@ class PriorityRulesMixin(object):
 
     @classmethod
     def suspend_request_orders(cls, client_id):
-        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==client_id).update(dict(suspended=True), synchronize_session=False)
+        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==client_id, Feature.id!=obj.id).update(dict(suspended=True), synchronize_session=False)
+        obj.suspended=False
 
 
 class SearchableMixin(object):
