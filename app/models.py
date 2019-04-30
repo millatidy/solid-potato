@@ -28,6 +28,7 @@ class PriorityRulesMixin(object):
             if isinstance(obj, PriorityRulesMixin):
                 if int(obj.client_priority.priority) == 1:
                     cls.suspend_request_orders(obj)
+                    obj.suspended = False
         for obj in session._changes['update']:
             if isinstance(obj, PriorityRulesMixin):
                 if int(obj.client_priority.priority) == 1:
