@@ -43,6 +43,8 @@ class PriorityRulesMixin(object):
     @classmethod
     def client_priority_exits(cls, obj):
         feature = Feature.query.filter(Feature.client_id==obj.client_id, Feature.client_priority==obj.client_priority, Feature.id != obj.id).first()
+        if not feature:
+            return False
         return (feature.id != obj.id)
 
 
@@ -190,15 +192,12 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
                     id=self.client_id)}}
         return data
 
-    def convert_date(self, string_date):
-        date_arr = string_date.split("-")
-        py_date = datetime(int(date_arr[0]), int(
-            date_arr[1]), int(date_arr[2]))
-        return py_date
-
     def from_dict(self, data):
-        data['target_date'] = self.convert_date(
-            data['target_date']) if (data['target_date'] not None) else None
+        if 'target_date' in data:
+            if len(data['target_date']) > 0:
+                data['target_date'] = datetime.strptime(data['target_date'], '%Y-%m-%d')
+            else:
+                del data['target_date']
         for field in [
             'title',
             'description',
