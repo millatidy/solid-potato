@@ -251,6 +251,8 @@ $(document).ready(function() {
         self.init = function(productAreas, clients) {
             self.productAreas(productAreas());
             self.clients(clients());
+            $("#inputClient").val('default');
+            $("#inputProductArea").val('default');
             $('#add').modal('show');
         }
 
@@ -311,6 +313,7 @@ $(document).ready(function() {
                 $('#data-requred').show();
                 return;
             };
+            $('#data-requred').hide();
             $('#edit').modal('hide');
             featuresViewModel.edit(self.feature, {
                 title: self.title(),
