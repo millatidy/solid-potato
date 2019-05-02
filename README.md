@@ -98,6 +98,13 @@ $ export FLASK_DEBUG=1
 ```
 >WARINING: *FOR DEVELOPEMENT ENVIRONMENT ONLY*
 
+## Run Tests
+Tests only exist for the [Flask] backend. To run them
+```sh
+$ export python tests.py
+```
+The process produces a test coverage file under [.../solid-potato/tmp/coverage]
+
 ## For production environments...
 In the docker-compose.yml file under environment please set up.
 
@@ -117,6 +124,7 @@ This repository is not open for contributions but what you do with the source is
 
 
    [git-repo-url]: <https://github.com/millatidy/solid-potato.git>
+   [.../solid-potato/tmp/coverage]: <https://github.com/millatidy/solid-potato/tree/master/tmp/coverage/>
    [production site]: <http://britecore.workshift.co.zw>
    [JINJA]: <http://jinja.pocoo.org/>
    [Bootstrap]: <https://getbootstrap.com/>
