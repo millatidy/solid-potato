@@ -9,7 +9,6 @@
                 <td><b>Feature Title</b></td>
                 <td><b>Priority</b></td>
                 <td><b>Target Date</b></td>
-                <td><b>Suspended</b></td
                 <td><b>Options</b></td>
                 </td>
         </thead>
@@ -19,11 +18,7 @@
                 <td data-bind="text: featureTitle"></td>
                 <td data-bind="text: clientPriority"></td>
                 <td data-bind="text: targetDate"></td>
-                <td data-bind="text: suspended">
                 <td>
-                    <span data-bind="visible: suspended">
-                        <button data-bind="click: $parent.reorder" class="btn btn-primary">Reorder</button>
-                    </span>
                     <button data-bind="click: $parent.beginEdit" class="btn btn-primary">Edit</button>
                     <button data-bind="click: $parent.remove" class="btn btn-primary">Delete</button>
                 </td>

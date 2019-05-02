@@ -97,26 +97,23 @@ def features(page, per_page):
         data = {}
         if client_id:
             data = Feature.to_collection_dict(
-                Feature.query.join(ClientPriority).filter_by(
+                Feature.query.filter_by(
                     client_id=client_id).order_by(
-                    ClientPriority.priority.asc()),
+                    Feature.client_priority.asc()),
                 page,
                 per_page,
                 'api.features')
         else:
-            data = Feature.to_collection_dict(Feature.query.filter_by(suspended=False).order_by(
+            data = Feature.to_collection_dict(Feature.query.order_by(
                 Feature.id.desc()), page, per_page, 'api.features')
         return jsonify(data)
     else:
         data = request.get_json()
         feature = Feature()
         feature.from_dict(data)
-        if feature.validate():
-            db.session.add(feature)
-            db.session.commit()
-            return jsonify(feature.to_dict())
-        else:
-            return jsonify({'error': 'Priority already exists'})
+        db.session.add(feature)
+        db.session.commit()
+        return jsonify(feature.to_dict())
 
 
 @bp.route('/features/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
@@ -126,7 +123,7 @@ def feature(id):
         return jsonify(feature.to_dict())
     elif request.method == 'PUT':
         data = request.get_json()
-        feature.from_dict(data)  # needs fixing unique constarain violation
+        feature.from_dict(data)
         db.session.commit()
         return jsonify(feature.to_dict())
     elif request.method == 'PATCH':

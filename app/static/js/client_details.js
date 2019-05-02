@@ -14,21 +14,6 @@ $(document).ready(function() {
         self.clientURI = "/api/clients/" + self.id();
         self.featureRequestsURI = "/api/features" + "?client_id=" + self.id();
 
-        self.reorder = function(feature) {
-          ApiGateway(feature.uri(), 'PATCH', {}).done(function(res) {
-              self.updateFeature(feature, res);
-          })
-        }
-
-        self.updateFeature = function(feature, newFeature) {
-          var i = self.requests.indexOf(feature);
-          self.requests()[i].featureTitle(newFeature.title);
-          self.requests()[i].targetDate(dateConverter(newFeature.targetDate));
-          self.requests()[i].clientID(newFeature.clientID),
-          self.requests()[i].clientPriority(newFeature.clientPriority);
-          self.requests()[i].suspended(newFeature.suspended);
-        }
-
         // Dummy function for editing a Feature Request
         self.beginEdit = function() {
             alert('we can edit from here');
@@ -54,7 +39,6 @@ $(document).ready(function() {
                         featureTitle: ko.observable(data.items[i].title),
                         clientPriority: ko.observable(data.items[i].clientPriority),
                         targetDate: ko.observable(dateConverter(data.items[i].targetDate)),
-                        suspended: ko.observable(data.items[i].suspended),
                         uri: ko.observable(data.items[i].links.self)
                     });
                 }

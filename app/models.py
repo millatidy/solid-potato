@@ -25,19 +25,25 @@ class PriorityRulesMixin(object):
     @classmethod
     def before_commit(cls, session):
         for obj in session._changes['add']:
-            if isinstance(obj, PriorityRulesMixin):
-                if int(obj.client_priority.priority) == 1:
-                    cls.suspend_request_orders(obj)
-                    obj.suspended = False
+            if isinstance(obj, PriorityRulesMixin) and cls.client_priority_exits(obj):
+                cls.reorder_client_priorities(obj)
         for obj in session._changes['update']:
-            if isinstance(obj, PriorityRulesMixin):
-                if int(obj.client_priority.priority) == 1:
-                    cls.suspend_request_orders(obj)
+            if isinstance(obj, PriorityRulesMixin) and cls.client_priority_exits(obj):
+                cls.reorder_client_priorities(obj)
 
     @classmethod
-    def suspend_request_orders(cls, obj):
-        Feature.query.filter(ClientPriority.priority > 1, Feature.client_id==obj.client_id, Feature.id!=obj.id).update(dict(suspended=True), synchronize_session=False)
-        obj.suspended=False
+    def reorder_client_priorities(cls, obj):
+        features = Feature.query.filter(Feature.client_id==obj.client_id, Feature.id != obj.id, Feature.client_priority >= obj.client_priority).order_by(Feature.client_priority.asc()).all()
+        current_priority = int(obj.client_priority)
+        for feature in features:
+            if feature.client_priority == current_priority:
+                feature.client_priority += 1
+            current_priority +=1
+
+    @classmethod
+    def client_priority_exits(cls, obj):
+        feature = Feature.query.filter(Feature.client_id==obj.client_id, Feature.client_priority==obj.client_priority, Feature.id != obj.id).first()
+        return (feature.id != obj.id)
 
 
 class SearchableMixin(object):
@@ -53,17 +59,8 @@ class SearchableMixin(object):
         return cls.query.filter(cls.id.in_(ids)).order_by(
             db.case(when, value=cls.id)), total
 
-    # @classmethod
-    # def before_commit(cls, session):
-    #     session._changes = {
-    #         'add': list(session.new),
-    #         'update': list(session.dirty),
-    #         'delete': list(session.deleted)
-    #     }
-
     @classmethod
     def after_commit(cls, session):
-        print(session._changes)
         for obj in session._changes['add']:
             if isinstance(obj, SearchableMixin):
                 add_to_index(obj.__tablename__, obj)
@@ -157,7 +154,7 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, index=True)
     description = db.Column(db.String(300))
-    suspended = db.Column(db.Boolean, default=False)
+    client_priority = db.Column(db.Integer)
     client_id = db.Column(
         db.Integer,
         db.ForeignKey('client.id')
@@ -169,10 +166,6 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
     target_date = db.Column(
         db.DateTime(),
         default=datetime.utcnow() + timedelta(days=90))
-    client_priority = db.relationship(
-        'ClientPriority',
-        cascade='all, delete, delete-orphan',
-        backref='feature', uselist=False)
 
     def to_dict(self):
         data = {
@@ -183,9 +176,8 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
             'productArea': self.product_area.name,
             'client': self.client.name,
             'clientID': self.client_id,
-            'clientPriority': self.client_priority.priority,
+            'clientPriority': self.client_priority,
             'targetDate': self.target_date,
-            'suspended': self.suspended,
             'links': {
                 'self': url_for(
                     'api.feature',
@@ -198,17 +190,6 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
                     id=self.client_id)}}
         return data
 
-    # needs modification unique contraint violation
-    def validate(self):
-        priority = ClientPriority.query.filter_by(
-            priority=self.client_priority.priority,
-            client_id=self.client_id).first()
-        if priority:
-            if self.id == priority.feature_id:
-                return True
-            return False
-        return True
-
     def convert_date(self, string_date):
         date_arr = string_date.split("-")
         py_date = datetime(int(date_arr[0]), int(
@@ -218,31 +199,17 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
     def from_dict(self, data):
         data['target_date'] = self.convert_date(
             data['target_date']) if 'target_date' in data else None
-        cli_pr = ClientPriority()
-        cli_pr.client_id = data['client_id']
-        cli_pr.priority = data['client_priority']
         for field in [
             'title',
             'description',
             'client_id',
             'product_area_id',
+            'client_priority',
                 'target_date']:
             if field in data:
                 setattr(self, field, data[field])
 
-        setattr(self, "client_priority", cli_pr)
-
         return self
-
-
-class ClientPriority(db.Model):
-
-    client_id = db.Column(
-        db.Integer,
-        db.ForeignKey('client.id'),
-        primary_key=True)
-    priority = db.Column(db.Integer, primary_key=True)
-    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'))
 
 
 db.event.listen(db.session, 'before_commit', SessionManager.before_commit)

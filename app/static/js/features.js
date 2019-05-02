@@ -41,11 +41,6 @@ $(document).ready(function() {
          */
         self.add = function(feature) {
             ApiGateway(self.featuresURI, 'POST', feature).done(function(data) {
-                if (data.error) {
-                    $('#priority-exits').show();
-                    return;
-                }
-                $('#priority-exits').hide();
                 addFeatureModel.destruct();
                 if (self.currentPage() == 1) {
                     self.features.unshift({

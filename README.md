@@ -1,5 +1,5 @@
 # solid-potato
-BriteCore Feature Request App
+## BriteCore Feature Request App
 
 ### How to download and run
 git clone https://github.com/millatidy/solid-potato.git<br>
