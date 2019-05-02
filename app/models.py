@@ -165,7 +165,7 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
         nullable=False)
     target_date = db.Column(
         db.DateTime(),
-        default=datetime.utcnow() + timedelta(days=90))
+        default=datetime.utcnow() + timedelta(days=15))
 
     def to_dict(self):
         data = {
@@ -198,7 +198,7 @@ class Feature(PriorityRulesMixin, SearchableMixin, PaginatedAPIMixin, db.Model):
 
     def from_dict(self, data):
         data['target_date'] = self.convert_date(
-            data['target_date']) if 'target_date' in data else None
+            data['target_date']) if (data['target_date'] not None) else None
         for field in [
             'title',
             'description',
